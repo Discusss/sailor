@@ -4,7 +4,7 @@ import os
 from discord import Bot
 from dotenv import load_dotenv
 
-import src.helpers.webhhoks as wb
+import helpers.webhhoks as wb
 
 logger = logging.getLogger('BOT')
 logger.setLevel(logging.INFO)
