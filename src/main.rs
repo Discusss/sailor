@@ -1,6 +1,8 @@
+use std::process::exit;
 use dotenvy::dotenv;
-use rocket::{get, http::Status, serde::json::Json};
+use rocket::{serde::json::Json};
 use serde::Serialize;
+use migration::{Migrator, MigratorTrait};
 
 #[macro_use]
 extern crate rocket;
@@ -9,14 +11,11 @@ extern crate rocket;
 extern crate log;
 
 mod db;
-mod schema;
 
 #[path = "routes/links.rs"]
 mod links_router;
 
-#[path = "models/links.rs"]
-mod links_model;
-
+mod entities;
 
 #[derive(Serialize)]
 pub struct GenericResponse {
@@ -41,21 +40,10 @@ pub struct GenericResponse {
 
  */
 
-#[get("/healthchecker", format = "application/json")]
-pub async fn health_checker_handler() -> Result<Json<GenericResponse>, Status> {
-    const MESSAGE: &str = "Build Simple CRUD API with Rust and Rocket";
-
-    let response_json = GenericResponse {
-        status: "success".to_string(),
-        message: MESSAGE.to_string(),
-    };
-    Ok(Json(response_json))
-}
-
 #[catch(404)]
 pub fn not_found() -> Json<GenericResponse> {
     let response_json = GenericResponse {
-        status: "error".to_string(),
+        status: "404".to_string(),
         message: "Not found".to_string(),
     };
     Json(response_json)
@@ -64,7 +52,7 @@ pub fn not_found() -> Json<GenericResponse> {
 #[catch(default)]
 pub fn internal_error() -> Json<GenericResponse> {
     let response_json = GenericResponse {
-        status: "error".to_string(),
+        status: "500".to_string(),
         message: "Internal server error".to_string(),
     };
     Json(response_json)
@@ -73,13 +61,27 @@ pub fn internal_error() -> Json<GenericResponse> {
 #[rocket::main]
 async fn main() {
     pretty_env_logger::init();
-
     dotenv().ok();
-    let pool = db::establish_connection();
+
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    let pool = match db::set_up_db(database_url).await {
+        Ok(db) =>{
+            assert!(db.ping().await.is_ok());
+            info!("Database connection established");
+            db
+        },
+        Err(err) => {
+            error!("{}", err);
+            exit(1);
+        },
+    };
+
+    Migrator::up(&pool, None).await.unwrap();
 
     if let Err(e) = rocket::build()
         .manage(pool)
-        .mount("/api", routes![health_checker_handler, links_router::get_domain])
+        .mount("/api", routes![links_router::get_domain])
         .register("/", catchers![not_found, internal_error])
         .launch()
         .await

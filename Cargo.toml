@@ -9,6 +9,9 @@ description = "A database with thousands of phishing links for moderating Discor
 repository = "https://github.com/Discusss/phishing"
 license = "GPL-3"
 
+[workspace]
+members = [".", "migration"]
+
 [profile.release]
 debug = false
 opt-level = 3
@@ -23,11 +26,12 @@ rpath = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+migration = { path = "migration" }
 chrono = { version = "0.4.23", features = ["serde"] }
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
 uuid = { version = "1.2.2", features = ["v4"] }
-diesel = { version = "2.1.0", features = ["postgres", "r2d2"] }
+sea-orm = { version = "0.12.2", features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros" ] }
 dotenvy = { version = "0.15.7" }
 log = { version = "0.4.20" }
 pretty_env_logger = { version = "0.5.0" }
