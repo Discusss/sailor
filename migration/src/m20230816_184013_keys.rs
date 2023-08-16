@@ -1,4 +1,5 @@
 use sea_orm_migration::prelude::*;
+use chrono;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -19,14 +20,14 @@ impl MigrationTrait for Migration {
                             .unique_key()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Keys::CreatedAt).timestamp().default("current_timestamp"))
-                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp().default("current_timestamp + interval '1 year'"))
-                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp().default("current_timestamp"))
+                    .col(ColumnDef::new(Keys::CreatedAt).timestamp().default(chrono::offset::Local::now().to_string()))
+                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp().default(chrono::offset::Local::now().to_string()))
+                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp().default(chrono::offset::Local::now().to_string()))
 
                     .col(ColumnDef::new(Keys::Owner).string().not_null().default("internal"))
                     .col(ColumnDef::new(Keys::Uses).integer().not_null().default(0))
 
-                    .col(ColumnDef::new(Keys::Ips).array(ColumnType::Text).not_null().default("ARRAY[]::text[]"))
+                    .col(ColumnDef::new(Keys::Ips).array(ColumnType::Text).not_null().default("{}"))
                     .col(ColumnDef::new(Keys::UserAgent).string().not_null().default("unknown"))
 
                     .col(ColumnDef::new(Keys::CreatedBy).string().not_null().default("system"))
