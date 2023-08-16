@@ -24,7 +24,7 @@ def _get_last_element_or_string(data):
 
 
 class WebhookReceiver:
-    def __init__(self, bot: Bot, review_channel_id: str, route="/webhook", port=5001, ):
+    def __init__(self, bot: Bot, review_channel_id: str, route="/webhook", port=5001):
         self._bot = bot
         self._route = route
         self._port = port
@@ -41,7 +41,10 @@ class WebhookReceiver:
     def receive_webhook(self):
         data = request.json
 
-        link = data["link"]
+        link: str = data["link"]
+        category: str = data["category"]
+        priority: int = data["priority"]
+        note: str = data["note"]
 
         if link is None:
             return jsonify({"message": "URL de phishing no proporcionada."}), 400
@@ -67,9 +70,19 @@ class WebhookReceiver:
                 "embeds": [
                     {
                         "title": "¡Nuevo Enlace a Revisar!",
-                        "description": f"{final_url}",
+                        "description": f"{parsed_url.netloc}",
                         "color": int(Color.gold()),
                         "fields": [
+                            {
+                                "name": "Categoría",
+                                "value": category,
+                                "inline": True
+                            },
+                            {
+                                "name": "Priority",
+                                "value": priority,
+                                "inline": True
+                            },
                             {
                                 "name": "Certificado SSL",
                                 "value": "Válido" if ssl_cert else "Inválido"
@@ -101,6 +114,10 @@ class WebhookReceiver:
                                 if registrar["expiration_date"] is not None
                                 else "No encontrado",
                                 "inline": True
+                            },
+                            {
+                                "name": "Notas del Usuario",
+                                "value": note if note != "" else "Sin nota."
                             }
                         ]
                     }
