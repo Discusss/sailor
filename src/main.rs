@@ -1,8 +1,9 @@
 use std::process::exit;
 use dotenvy::dotenv;
-use rocket::{serde::json::Json};
-use serde::Serialize;
+use rocket::http::Method;
+use rocket::shield::Shield;
 use migration::{Migrator, MigratorTrait};
+use rocket_cors::AllowedHeaders;
 
 #[macro_use]
 extern crate rocket;
@@ -11,17 +12,10 @@ extern crate rocket;
 extern crate log;
 
 mod db;
-
-#[path = "routes/links.rs"]
-mod links_router;
-
+mod routes;
+mod utils;
 mod entities;
 
-#[derive(Serialize)]
-pub struct GenericResponse {
-    pub status: String,
-    pub message: String,
-}
 
 /*
 
@@ -40,24 +34,6 @@ pub struct GenericResponse {
 
  */
 
-#[catch(404)]
-pub fn not_found() -> Json<GenericResponse> {
-    let response_json = GenericResponse {
-        status: "404".to_string(),
-        message: "Not found".to_string(),
-    };
-    Json(response_json)
-}
-
-#[catch(default)]
-pub fn internal_error() -> Json<GenericResponse> {
-    let response_json = GenericResponse {
-        status: "500".to_string(),
-        message: "Internal server error".to_string(),
-    };
-    Json(response_json)
-}
-
 #[rocket::main]
 async fn main() {
     pretty_env_logger::init();
@@ -66,7 +42,7 @@ async fn main() {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     let pool = match db::set_up_db(database_url).await {
-        Ok(db) =>{
+        Ok(db) => {
             assert!(db.ping().await.is_ok());
             info!("Database connection established");
             db
@@ -79,10 +55,24 @@ async fn main() {
 
     Migrator::up(&pool, None).await.unwrap();
 
+    let cors = rocket_cors::CorsOptions {
+        allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+        .to_cors();
+
+    let prometheus = utils::prometheus::configure();
+
     if let Err(e) = rocket::build()
         .manage(pool)
-        .mount("/api", routes![links_router::get_domain])
-        .register("/", catchers![not_found, internal_error])
+        .mount("/api", routes![routes::links::get_domain])
+        .mount("/metrics", prometheus.clone())
+        .register("/", catchers![routes::errors::not_found, routes::errors::internal_error])
+        .attach(Shield::default())
+        .attach(cors.unwrap())
+        .attach(prometheus)
         .launch()
         .await
     {

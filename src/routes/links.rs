@@ -3,14 +3,16 @@ use rocket::serde::json::{Json, Value};
 use rocket::serde::json::serde_json::json;
 use rocket::State;
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
-use super::entities::{prelude::*, *};
-
+use crate::entities::{prelude::*, *};
+use crate::utils::parser;
 
 #[get("/link?<domain>")]
 pub async fn get_domain(db: &State<DatabaseConnection>, domain: String) -> Result<Json<Value>, Status> {
     let db = db as &DatabaseConnection;
 
-    println!("Domain: {}", domain);
+    if !parser::is_valid_domain(&domain) {
+        return Err(Status::BadRequest);
+    }
 
     let domain_info: links::Model = match Links::find()
         .filter(links::Column::Domain.contains(domain))
