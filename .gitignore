@@ -17,7 +17,7 @@ Cargo.lock
 # Added by cargo
 
 /target
-.env
+**/.env
 .idea
 *.log
 **/__pycache__/

@@ -1,0 +1,16 @@
+name: AntiPhishingBot
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pip
+  - py-cord
+  - python-dotenv
+  - Flask
+  - futures
+  - PySocks
+  - pip:
+    - whoisdomain

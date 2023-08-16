@@ -21,6 +21,7 @@ cogs = [
 ]
 client.load_extensions(*cogs)
 
-wb.WebhookReceiver(client).start()
+wb.WebhookReceiver(client, os.getenv("REVIEWING_CHANNEL_ID")).start()
 
 client.run(os.getenv("BOT_TOKEN"))
+
