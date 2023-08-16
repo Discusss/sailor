@@ -2,6 +2,7 @@ use std::process::exit;
 use dotenvy::dotenv;
 use rocket::{serde::json::Json};
 use serde::Serialize;
+use migration::{Migrator, MigratorTrait};
 
 #[macro_use]
 extern crate rocket;
@@ -14,7 +15,7 @@ mod db;
 #[path = "routes/links.rs"]
 mod links_router;
 
-
+mod entities;
 
 #[derive(Serialize)]
 pub struct GenericResponse {
@@ -75,6 +76,8 @@ async fn main() {
             exit(1);
         },
     };
+
+    Migrator::up(&pool, None).await.unwrap();
 
     if let Err(e) = rocket::build()
         .manage(pool)
