@@ -23,4 +23,11 @@ rpath = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dotenvy = "0.15"
+chrono = { version = "0.4.23", features = ["serde"] }
+rocket = { version = "0.5.0-rc.2", features = ["json"] }
+serde = { version = "1.0.152", features = ["derive"] }
+uuid = { version = "1.2.2", features = ["v4"] }
+diesel = { version = "2.1.0", features = ["postgres", "r2d2"] }
+dotenvy = { version = "0.15.7" }
+log = { version = "0.4.20" }
+pretty_env_logger = { version = "0.5.0" }
