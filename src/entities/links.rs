@@ -5,28 +5,20 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    #[sea_orm(column_type = "Text")]
     pub domain: String,
     pub category: String,
     pub priority: i32,
-    #[sea_orm(column_type = "Text")]
     pub public_notes: String,
-    #[sea_orm(column_type = "Text")]
     pub submitted_by: String,
     pub submitted_at: Option<DateTime>,
-    #[sea_orm(column_type = "Text", nullable)]
     pub submitted_ip: Option<String>,
-    #[sea_orm(column_type = "Text", nullable)]
     pub submitted_user_agent: Option<String>,
-    #[sea_orm(column_type = "Text")]
     pub submitted_reason: String,
-    #[sea_orm(column_type = "Text", nullable)]
     pub approved_by: Option<String>,
     pub approved_at: Option<DateTime>,
-    #[sea_orm(column_type = "Text")]
-    pub approved_key: String,
-    #[sea_orm(column_type = "Text")]
+    pub approved_key: Option<String>,
     pub notes: String,
+    pub times_consulted: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

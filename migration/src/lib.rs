@@ -2,6 +2,8 @@ pub use sea_orm_migration::prelude::*;
 
 mod m20230816_182907_links;
 mod m20230816_184013_keys;
+mod m20230817_155040_blacklist;
+
 
 pub struct Migrator;
 
@@ -11,6 +13,7 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20230816_182907_links::Migration),
             Box::new(m20230816_184013_keys::Migration),
+            Box::new(m20230817_155040_blacklist::Migration),
         ]
     }
 }

@@ -1,6 +1,5 @@
 use sea_orm_migration::prelude::*;
 use crate::m20230816_184013_keys::Keys;
-use chrono;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -27,7 +26,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Links::PublicNotes).string().not_null().default(""))
 
                     .col(ColumnDef::new(Links::SubmittedBy).string().not_null())
-                    .col(ColumnDef::new(Links::SubmittedAt).timestamp().default(chrono::offset::Local::now().to_string()))
+                    .col(ColumnDef::new(Links::SubmittedAt).timestamp().not_null())
                     .col(ColumnDef::new(Links::SubmittedIp).string())
                     .col(ColumnDef::new(Links::SubmittedUserAgent).string())
                     .col(ColumnDef::new(Links::SubmittedReason).string().not_null())

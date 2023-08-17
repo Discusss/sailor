@@ -1,15 +1,9 @@
 use std::{env, time::Instant};
 
 use prometheus::{opts, Encoder, HistogramVec, IntCounterVec, Registry, TextEncoder};
-use rocket::{
-    fairing::{Fairing, Info, Kind},
-    http::{ContentType, Method},
-    route::{Handler, Outcome},
-    Data, Request, Response, Route,
-};
+use rocket::{fairing::{Fairing, Info, Kind}, http::{ContentType, Method}, route::{Handler, Outcome}, Data, Request, Response, Route};
 
 pub use prometheus;
-use crate::utils::auth;
 
 pub fn configure() -> PrometheusMetrics {
     let prom = PrometheusMetrics::new();
@@ -233,8 +227,8 @@ impl Handler for PrometheusMetrics {
             return Outcome::Failure(rocket::http::Status::Unauthorized);
         }
 
-        let is_allowed = auth::is_authorised(auth.unwrap().to_string());
-        if !is_allowed {
+        let key = env::var("PROMETHEUS_KEY").expect("PROMETHEUS_KEY must be set");
+        if auth.unwrap() != key {
             return Outcome::Failure(rocket::http::Status::Unauthorized);
         }
 

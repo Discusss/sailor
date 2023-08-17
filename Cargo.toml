@@ -37,4 +37,4 @@ sea-orm = { version = "0.12.2", features = [ "sqlx-postgres", "runtime-tokio-rus
 dotenvy = { version = "0.15.7" }
 log = { version = "0.4.19" }
 pretty_env_logger = { version = "0.5.0" }
-url = { version = "2.4.0" }
+validators = { version = "0.24.3" }

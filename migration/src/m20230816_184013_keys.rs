@@ -1,5 +1,4 @@
 use sea_orm_migration::prelude::*;
-use chrono;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -20,9 +19,9 @@ impl MigrationTrait for Migration {
                             .unique_key()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Keys::CreatedAt).timestamp().default(chrono::offset::Local::now().to_string()))
-                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp().default(chrono::offset::Local::now().to_string()))
-                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp().default(chrono::offset::Local::now().to_string()))
+                    .col(ColumnDef::new(Keys::CreatedAt).timestamp().not_null())
+                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp().not_null())
+                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp().not_null())
 
                     .col(ColumnDef::new(Keys::Owner).string().not_null().default("internal"))
                     .col(ColumnDef::new(Keys::Uses).integer().not_null().default(0))

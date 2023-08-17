@@ -1,18 +1,33 @@
 use rocket::http::Status;
 use rocket::serde::json::{Json, Value};
 use rocket::serde::json::serde_json::json;
-use rocket::State;
+use rocket::{State};
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 use crate::entities::{prelude::*, *};
+use crate::structs::ip::RemoteAddress;
 use crate::utils::parser;
 
 #[get("/link?<domain>")]
-pub async fn get_domain(db: &State<DatabaseConnection>, domain: String) -> Result<Json<Value>, Status> {
+pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String) -> Result<Json<Value>, Status> {
     let db = db as &DatabaseConnection;
 
     if !parser::is_valid_domain(&domain) {
         return Err(Status::BadRequest);
     }
+
+    let ip = remote.0;
+
+    match Blacklist::find()
+        .filter(blacklist::Column::Ip.eq(ip))
+        .one(db)
+        .await
+    {
+        Ok(blacklisted_ip) => match blacklisted_ip {
+            Some(_) => return Err(Status::Forbidden),
+            _ => {}
+        },
+        Err(_) => return Err(Status::InternalServerError),
+    };
 
     let domain_info: links::Model = match Links::find()
         .filter(links::Column::Domain.contains(domain))
@@ -27,7 +42,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, domain: String) -> Resul
     };
 
     let response_json = json!({
-        "status": "success".to_string(),
+        "status": "200".to_string(),
         "data": json!({
             "domain": domain_info.domain,
             "category": domain_info.category,

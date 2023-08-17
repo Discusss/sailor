@@ -15,7 +15,7 @@ mod db;
 mod routes;
 mod utils;
 mod entities;
-
+mod structs;
 
 /*
 
