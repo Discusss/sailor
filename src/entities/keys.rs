@@ -5,7 +5,7 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub key: String,
-    pub created_at: Option<DateTime>,
+    pub created_at: DateTime,
     pub expires_at: Option<DateTime>,
     pub last_used_at: Option<DateTime>,
     pub owner: String,

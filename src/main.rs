@@ -4,6 +4,7 @@ use rocket::http::Method;
 use rocket::shield::Shield;
 use migration::{Migrator, MigratorTrait};
 use rocket_cors::AllowedHeaders;
+use crate::structs::auth::validate_master_key;
 
 #[macro_use]
 extern crate rocket;
@@ -45,6 +46,7 @@ async fn main() {
         Ok(db) => {
             assert!(db.ping().await.is_ok());
             info!("Database connection established");
+            validate_master_key(&db).await;
             db
         },
         Err(err) => {
@@ -67,9 +69,9 @@ async fn main() {
 
     if let Err(e) = rocket::build()
         .manage(pool)
-        .mount("/api", routes![routes::links::get_domain])
+        .mount("/api", routes::api())
         .mount("/metrics", prometheus.clone())
-        .register("/", catchers![routes::errors::not_found, routes::errors::internal_error])
+        .register("/", routes::catchers())
         .attach(Shield::default())
         .attach(cors.unwrap())
         .attach(prometheus)

@@ -20,8 +20,8 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Keys::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp().not_null())
-                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp().not_null())
+                    .col(ColumnDef::new(Keys::ExpiresAt).timestamp())
+                    .col(ColumnDef::new(Keys::LastUsedAt).timestamp())
 
                     .col(ColumnDef::new(Keys::Owner).string().not_null().default("internal"))
                     .col(ColumnDef::new(Keys::Uses).integer().not_null().default(0))

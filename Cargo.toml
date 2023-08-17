@@ -32,7 +32,7 @@ rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rocket_cors = { version = "0.6.0-alpha2" }
 prometheus = { version = "0.13.3" }
 serde = { version = "1.0.152", features = ["derive"] }
-uuid = { version = "1.2.2", features = ["v4"] }
+uuid = { version = "1.4.1", features = ["v4"] }
 sea-orm = { version = "0.12.2", features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros" ] }
 dotenvy = { version = "0.15.7" }
 log = { version = "0.4.19" }

@@ -1,8 +1,12 @@
+use std::process::exit;
 use rocket::Request;
 use rocket::request::{FromRequest, Outcome};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
+use serde::{Deserialize, Serialize};
+use validators::prelude::*;
 use crate::entities::keys;
 use crate::entities::prelude::Keys;
+use uuid::Uuid;
 
 pub struct Auth {
     pub is_valid: bool,
@@ -12,6 +16,11 @@ pub struct Auth {
 }
 
 pub async fn get_key(key: &String, db: &DatabaseConnection) -> Option<keys::Model> {
+
+    let key = key.replace("Bearer ", "");
+    if !is_valid_key(&key) {
+        return None;
+    }
 
     let k: keys::Model = match Keys::find()
         .filter(keys::Column::Key.eq(key))
@@ -45,6 +54,15 @@ impl<'r> FromRequest<'r> for Auth {
             }),
         }.replace("Bearer ", "");
 
+        if !is_valid_key(&key) {
+            return Outcome::Success(Auth {
+                is_valid: false,
+                key: None,
+                data: None,
+                error_message: Some("Invalid key".to_string()),
+            });
+        }
+
 
         let data = match get_key(&key, db).await {
             Some(key) => key,
@@ -56,7 +74,7 @@ impl<'r> FromRequest<'r> for Auth {
             }),
         };
 
-        if data.expires_at.unwrap() < chrono::Utc::now().naive_utc() {
+        if data.expires_at.is_some() && data.expires_at.unwrap() < chrono::Utc::now().naive_utc() {
             return Outcome::Success(Auth {
                 is_valid: false,
                 key: None,
@@ -72,4 +90,71 @@ impl<'r> FromRequest<'r> for Auth {
             error_message: None,
         });
     }
+}
+
+#[derive(Validator)]
+#[validator(uuid(case(Any), separator(NotAllow)))]
+struct UUID(pub u128);
+
+pub fn is_valid_key(key: &String) -> bool {
+    let key = key.replace("Bearer ", "");
+    UUID::parse_string(&key).is_ok()
+}
+
+pub async fn validate_master_key(db: &DatabaseConnection) {
+    let master_key = std::env::var("MASTER_KEY").expect("MASTER_KEY must be set");
+
+    if !is_valid_key(&master_key) {
+        error!("Invalid master key: key must be a valid UUID, received '{}'\nSuggested key: {}", master_key, Uuid::new_v4().to_string().replace("-", ""));
+        exit(1);
+    }
+
+    match Keys::find()
+        .filter(keys::Column::Key.eq(master_key.clone()))
+        .one(db)
+        .await
+    {
+        Ok(info) => match info {
+            Some(info) => info,
+            None => {
+
+                let now = chrono::Utc::now().naive_utc();
+                let new_key = keys::ActiveModel {
+                    key: Set(master_key.clone()),
+                    created_at: Set(now),
+                    expires_at: Set(None),
+                    last_used_at: Set(None),
+                    owner: Set("system".to_string()),
+                    uses: Set(0),
+                    ips: Set(vec![]),
+                    user_agent: Set("system".to_string()),
+                    created_by: Set("system".to_string()),
+                    notes: Set("Master key".to_string()),
+                };
+
+                let new_key = match new_key.insert(db).await {
+                    Ok(key) => key,
+                    Err(err) => {
+                        error!("Error creating master key: {}", err);
+                        exit(1);
+                    },
+                };
+
+                info!("Created master key: {}", new_key.key);
+                new_key
+            },
+        },
+        Err(_) => {
+            error!("Error creating master key");
+            exit(1);
+        },
+    };
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CreateKeyBody {
+    expires_at: String,
+    owner: String,
+    created_by: String,
+    notes: Option<String>,
 }
