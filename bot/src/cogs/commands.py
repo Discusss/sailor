@@ -38,7 +38,7 @@ class Commands(commands.Cog):
                 description="Enlace mandado a revisar, gracias por la ayuda."
             )
 
-        # TODO: Api calls.
+        # TODO: Api call to submit for reviewing.
 
         await ctx.respond(embed=embed)
 

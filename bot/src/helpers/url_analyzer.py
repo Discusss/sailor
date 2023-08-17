@@ -1,22 +1,48 @@
 import socket
-import ssl
+from urllib.parse import urlparse
+
+from OpenSSL import SSL
+from OpenSSL.crypto import load_certificate, FILETYPE_PEM
+from cryptography import x509
+from cryptography.hazmat._oid import NameOID
+from cryptography.hazmat.backends import default_backend
 
 import whois
 
 # TODO: Make both functions work when no protocol is present
+from cryptography.hazmat.primitives import serialization
+
+
+def get_netloc(url):
+    parsed = urlparse(url)
+    if parsed.netloc == '' and parsed.path != '':
+        # Handle cases where netloc is empty but path is present (e.g., google.com)
+        return parsed.path
+    else:
+        return parsed.netloc
+
+
 def check_ssl_certificate(domain):
     try:
-        context = ssl.create_default_context()
         with socket.create_connection((domain, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                cert = ssock.getpeercert()
+            ctx = SSL.Context(SSL.SSLv23_METHOD)
+            ctx.check_hostname = True
+            ctx.verify_mode = SSL.VERIFY_PEER
 
-                # Check if the SSL certificate is valid
-                if ssl.match_hostname(cert, domain):
-                    return True
-    except Exception:
-        return False
-    return False
+            sock = SSL.Connection(ctx, sock)
+            sock.set_tlsext_host_name(domain.encode())
+            sock.set_connect_state()
+            sock.do_handshake()
+
+            cert_pem = sock.get_peer_certificate().to_cryptography()
+            x509_cert = x509.load_der_x509_certificate(
+                cert_pem.public_bytes(serialization.Encoding.DER), default_backend()
+            )
+            return True, x509_cert.issuer.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)[0].value
+    except SSL.Error:
+        return False, ""
+    except socket.gaierror:
+        return False, ""
 
 
 def get_domain_registration_info(domain):

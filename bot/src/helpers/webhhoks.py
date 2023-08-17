@@ -5,7 +5,7 @@ import re
 from threading import Thread
 from urllib.parse import urlparse
 
-import helpers.url_analyzer as url_analyzer
+import src.helpers.url_analyzer as url_analyzer
 import requests
 from discord import Bot, Color
 from flask import Flask, jsonify, request
@@ -85,7 +85,7 @@ class WebhookReceiver:
                             },
                             {
                                 "name": "Certificado SSL",
-                                "value": "Válido" if ssl_cert else "Inválido"
+                                "value": f"Válido ({ssl_cert[1]})" if ssl_cert[0] else "Inválido"
                             },
                             {
                                 "name": "Registrar",
