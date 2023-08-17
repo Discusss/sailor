@@ -85,7 +85,7 @@ class WebhookReceiver:
                             },
                             {
                                 "name": "Certificado SSL",
-                                "value": "Válido" if ssl_cert else "Inválido"
+                                "value": f"Válido ({ssl_cert[1]})" if ssl_cert[0] else "Inválido"
                             },
                             {
                                 "name": "Registrar",

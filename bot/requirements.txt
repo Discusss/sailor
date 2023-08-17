@@ -4,3 +4,5 @@ python-dotenv
 Flask
 requests
 python-whois
+cryptography
+pyOpenSSL
