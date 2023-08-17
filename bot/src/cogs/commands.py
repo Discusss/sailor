@@ -3,7 +3,8 @@ import re
 from discord import ApplicationContext, Option, Embed, Color, slash_command
 from discord.ext import commands
 
-from src.constants import MALICIOUS_CATEGORIES
+from constants import MALICIOUS_CATEGORIES
+from helpers.url_analyzer import get_netloc
 
 
 class Commands(commands.Cog):
@@ -30,7 +31,13 @@ class Commands(commands.Cog):
                 color=Color.red(),
                 description="No se ha detectado ningún enlace."
             )
+            await ctx.respond(embed=embed)
+            return
+
+        netloc = get_netloc(urls[0])
         # TODO: Elif checking if already added.
+        if True:
+            pass
         else:
             embed = Embed(
                 title="Reporte de Enlaces",

@@ -1,11 +1,11 @@
 import logging
 
-import src.constants as constants
+import constants as constants
 import discord
 from discord import Embed
 from discord.ext import commands
 
-from src.views.confirmation_modal import ConfirmationModal
+from views.confirmation_modal import ConfirmationModal
 
 logger = logging.getLogger('BOT')
 

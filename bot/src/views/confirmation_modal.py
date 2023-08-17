@@ -1,7 +1,7 @@
 from discord import Color, Embed, InputTextStyle, Interaction
 from discord.ui import InputText, Modal
 
-from src.constants import MALICIOUS_CATEGORIES
+from constants import MALICIOUS_CATEGORIES
 
 
 class ConfirmationModal(Modal):

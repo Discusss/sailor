@@ -5,7 +5,7 @@ import re
 from threading import Thread
 from urllib.parse import urlparse
 
-import src.helpers.url_analyzer as url_analyzer
+import helpers.url_analyzer as url_analyzer
 import requests
 from discord import Bot, Color
 from flask import Flask, jsonify, request
