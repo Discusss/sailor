@@ -1,0 +1,16 @@
+.gitignore		export-ignore
+.gitattributes		export-ignore
+
+update_version		export-ignore
+
+*.bat eol=crlf
+*.sln eol=crlf
+*.vcxproj eol=crlf
+*.vcxproj.filters eol=crlf
+common.props eol=crlf
+*.sh eol=lf
+*.rs eol=lf
+*.py eol=lf
+*.md eol=lf
+*.txt eol=lf
+*.py eol=lf
