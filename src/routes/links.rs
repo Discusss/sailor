@@ -16,7 +16,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
         return Err(Status::BadRequest);
     }
 
-    if !remote.is_blacklisted {
+    if remote.is_blacklisted {
         return Err(Status::Forbidden);
     }
 
