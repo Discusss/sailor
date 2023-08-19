@@ -12,7 +12,7 @@ ADD . ./
 RUN cargo build --release
 
 # ===========================
-FROM debian:buster-slim
+FROM debian:12.1-slim
 
 ARG APP=/usr/src/app
 
@@ -28,6 +28,7 @@ RUN groupadd $APP_USER \
 COPY --from=builder /phishing/target/release/phishing ${APP}/phishing
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
+RUN ldd --version
 
 USER $APP_USER
 WORKDIR ${APP}
@@ -35,6 +36,5 @@ WORKDIR ${APP}
 ENV RUST_LOG=info
 
 # TODO: fix glibc
-RUN sudo apt install libc6 -y
 
 CMD ["./phishing"]

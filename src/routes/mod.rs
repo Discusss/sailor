@@ -3,7 +3,7 @@ pub mod errors;
 pub mod keys;
 
 pub fn api() -> Vec<rocket::Route> {
-    return routes![links::get_domain, keys::create_key];
+    return routes![links::get_domain, keys::create_key, keys::get_key, keys::delete_key];
 }
 
 pub fn catchers() -> Vec<rocket::Catcher> {

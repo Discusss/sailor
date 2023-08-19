@@ -58,7 +58,7 @@ async fn main() {
     Migrator::up(&pool, None).await.unwrap();
 
     let cors = rocket_cors::CorsOptions {
-        allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
+        allowed_methods: vec![Method::Get, Method::Post, Method::Delete].into_iter().map(From::from).collect(),
         allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
         allow_credentials: true,
         ..Default::default()

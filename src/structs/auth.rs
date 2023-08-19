@@ -7,6 +7,7 @@ use validators::prelude::*;
 use crate::entities::keys;
 use crate::entities::prelude::Keys;
 use uuid::Uuid;
+use crate::structs::ip::{get_ip};
 
 pub struct Auth {
     pub is_valid: bool,
@@ -83,6 +84,47 @@ impl<'r> FromRequest<'r> for Auth {
             });
         }
 
+        let master_key = std::env::var("MASTER_KEY").expect("MASTER_KEY must be set");
+        if data.key != master_key {
+            let mut key: keys::ActiveModel = data.into();
+
+            let ip = get_ip(request);
+            let user_agent = request.headers().get_one("User-Agent").unwrap_or("Unknown").to_string();
+
+            key.last_used_at = Set(Some(chrono::Utc::now().naive_utc()));
+            key.uses = Set(key.uses.unwrap() + 1);
+
+            let mut ips = key.ips.clone().unwrap();
+            if !ips.contains(&ip) {
+                ips.push(ip.to_string());
+                key.ips = Set(ips);
+            }
+
+            if user_agent != "Unknown" && user_agent != "" {
+                key.user_agent = Set(user_agent);
+            }
+
+            return match key.update(db).await {
+                Ok(new_key) => {
+                    Outcome::Success(Auth {
+                        is_valid: true,
+                        key: Some(new_key.key.clone()),
+                        data: Some(new_key),
+                        error_message: None,
+                    })
+                }
+                Err(err) => {
+                    error!("Error updating key: {}", err);
+                    Outcome::Success(Auth {
+                        is_valid: false,
+                        key: None,
+                        data: None,
+                        error_message: Some("Error updating key".to_string()),
+                    })
+                },
+            };
+        }
+
         return Outcome::Success(Auth {
             is_valid: true,
             key: Some(key),
@@ -94,18 +136,23 @@ impl<'r> FromRequest<'r> for Auth {
 
 #[derive(Validator)]
 #[validator(uuid(case(Any), separator(NotAllow)))]
-struct UUID(pub u128);
+pub struct ApiKey(pub u128);
+impl ApiKey {
+    pub fn generate() -> String {
+        Uuid::new_v4().to_string().replace("-", "")
+    }
+}
 
 pub fn is_valid_key(key: &String) -> bool {
     let key = key.replace("Bearer ", "");
-    UUID::parse_string(&key).is_ok()
+    ApiKey::parse_string(&key).is_ok()
 }
 
 pub async fn validate_master_key(db: &DatabaseConnection) {
     let master_key = std::env::var("MASTER_KEY").expect("MASTER_KEY must be set");
 
     if !is_valid_key(&master_key) {
-        error!("Invalid master key: key must be a valid UUID, received '{}'\nSuggested key: {}", master_key, Uuid::new_v4().to_string().replace("-", ""));
+        error!("Invalid master key: key must be a valid UUID, received '{}'\nSuggested key: {}", master_key, ApiKey::generate());
         exit(1);
     }
 
@@ -153,8 +200,8 @@ pub async fn validate_master_key(db: &DatabaseConnection) {
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateKeyBody {
-    expires_at: String,
-    owner: String,
-    created_by: String,
-    notes: Option<String>,
+    pub(crate) expires_at: String,
+    pub(crate) owner: String,
+    pub(crate) created_by: String,
+    pub(crate) notes: Option<String>,
 }
