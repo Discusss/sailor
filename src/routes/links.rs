@@ -16,19 +16,9 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
         return Err(Status::BadRequest);
     }
 
-    let ip = remote.0;
-
-    match Blacklist::find()
-        .filter(blacklist::Column::Ip.eq(ip))
-        .one(db)
-        .await
-    {
-        Ok(blacklisted_ip) => match blacklisted_ip {
-            Some(_) => return Err(Status::Forbidden),
-            _ => {}
-        },
-        Err(_) => return Err(Status::InternalServerError),
-    };
+    if !remote.is_blacklisted {
+        return Err(Status::Forbidden);
+    }
 
     let domain_info: links::Model = match Links::find()
         .filter(links::Column::Domain.contains(domain))

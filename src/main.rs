@@ -25,11 +25,6 @@ mod structs;
     POST /api/link/approve (with JSON body, needs auth) --> Aprobar el dominio en la base de datos
     POST /api/link/reject (with JSON body, needs auth) --> Rechazar el dominio en la base de datos (borrarlo)
 
-    GET /api/blacklist (needs auth) --> Obtener todas las IPs de la lista negra
-    POST /api/blacklist (with JSON body, needs auth) --> Insertar una IP en la lista negra
-
-    GET /docs/... --> Documentación de la API
-
     ==== Webhook ====
     POST /webhook (with JSON body) --> Mandar al bot de discord información sobre un nuevo dominio
 

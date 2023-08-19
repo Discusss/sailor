@@ -1,7 +1,13 @@
 use rocket::{Request};
 use rocket::request::{FromRequest, Outcome};
+use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use crate::entities::blacklist;
+use crate::entities::prelude::Blacklist;
 
-pub struct RemoteAddress(pub(crate) String);
+pub struct RemoteAddress {
+    pub ip: String,
+    pub is_blacklisted: bool
+}
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for RemoteAddress {
@@ -9,7 +15,30 @@ impl<'r> FromRequest<'r> for RemoteAddress {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = get_ip(request);
-        Outcome::Success(RemoteAddress(ip))
+        let db = request.rocket().state::<DatabaseConnection>().unwrap();
+
+        match Blacklist::find()
+            .filter(blacklist::Column::Ip.contains(ip.clone()))
+            .one(db)
+            .await
+        {
+            Ok(ban) => match ban {
+                Some(_) => (),
+                None => return Outcome::Success(RemoteAddress {
+                    ip,
+                    is_blacklisted: false
+                }),
+            }
+            Err(_) => return Outcome::Success(RemoteAddress {
+                ip,
+                is_blacklisted: false
+            }),
+        };
+
+        Outcome::Success(RemoteAddress {
+            ip,
+            is_blacklisted: true
+        })
     }
 }
 
