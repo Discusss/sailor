@@ -205,3 +205,15 @@ pub struct CreateKeyBody {
     pub(crate) created_by: String,
     pub(crate) notes: Option<String>,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct UpdateKeyBody {
+    pub(crate) expires_at: Option<String>,
+    pub(crate) last_used_at: Option<String>,
+    pub(crate) owner: Option<String>,
+    pub(crate) uses: Option<i32>,
+    pub(crate) ips: Option<Vec<String>>,
+    pub(crate) user_agent: Option<String>,
+    pub(crate) created_by: Option<String>,
+    pub(crate) notes: Option<String>,
+}
