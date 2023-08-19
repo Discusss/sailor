@@ -19,8 +19,8 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Blacklist::Reason).string().not_null().default(""))
-                    .col(ColumnDef::new(Blacklist::ExpiresAt).timestamp().not_null())
                     .col(ColumnDef::new(Blacklist::CreatedAt).timestamp().not_null())
+                    .col(ColumnDef::new(Blacklist::ExpiresAt).timestamp())
                     .col(ColumnDef::new(Blacklist::CreatedBy).string().not_null().default("system"))
                     .col(ColumnDef::new(Blacklist::Notes).string().not_null().default(""))
                     .to_owned(),

@@ -6,7 +6,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub ip: String,
     pub reason: String,
-    pub expires_at: DateTime,
+    pub expires_at: Option<DateTime>,
     pub created_at: DateTime,
     pub created_by: String,
     pub notes: String,

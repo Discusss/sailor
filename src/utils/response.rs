@@ -12,3 +12,9 @@ pub struct DataResponse {
     pub status: String,
     pub data: Value
 }
+
+#[derive(Serialize)]
+pub struct DataResponseArray {
+    pub status: String,
+    pub data: Vec<Value>
+}

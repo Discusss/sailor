@@ -11,6 +11,7 @@ use crate::structs::ip::{get_ip};
 
 pub struct Auth {
     pub is_valid: bool,
+    pub is_master: bool,
     pub key: Option<String>,
     pub data: Option<keys::Model>,
     pub error_message: Option<String>,
@@ -49,6 +50,7 @@ impl<'r> FromRequest<'r> for Auth {
             Some(key) => key,
             None => return Outcome::Success(Auth {
                 is_valid: false,
+                is_master: false,
                 key: None,
                 data: None,
                 error_message: Some("No Authorization header provided".to_string()),
@@ -58,6 +60,7 @@ impl<'r> FromRequest<'r> for Auth {
         if !is_valid_key(&key) {
             return Outcome::Success(Auth {
                 is_valid: false,
+                is_master: false,
                 key: None,
                 data: None,
                 error_message: Some("Invalid key".to_string()),
@@ -69,6 +72,7 @@ impl<'r> FromRequest<'r> for Auth {
             Some(key) => key,
             None => return Outcome::Success(Auth {
                 is_valid: false,
+                is_master: false,
                 key: None,
                 data: None,
                 error_message: Some("Invalid key".to_string()),
@@ -78,6 +82,7 @@ impl<'r> FromRequest<'r> for Auth {
         if data.expires_at.is_some() && data.expires_at.unwrap() < chrono::Utc::now().naive_utc() {
             return Outcome::Success(Auth {
                 is_valid: false,
+                is_master: false,
                 key: None,
                 data: None,
                 error_message: Some("Key expired, please contact support to renew your key".to_string()),
@@ -108,6 +113,7 @@ impl<'r> FromRequest<'r> for Auth {
                 Ok(new_key) => {
                     Outcome::Success(Auth {
                         is_valid: true,
+                        is_master: false,
                         key: Some(new_key.key.clone()),
                         data: Some(new_key),
                         error_message: None,
@@ -117,6 +123,7 @@ impl<'r> FromRequest<'r> for Auth {
                     error!("Error updating key: {}", err);
                     Outcome::Success(Auth {
                         is_valid: false,
+                        is_master: false,
                         key: None,
                         data: None,
                         error_message: Some("Error updating key".to_string()),
@@ -127,6 +134,7 @@ impl<'r> FromRequest<'r> for Auth {
 
         return Outcome::Success(Auth {
             is_valid: true,
+            is_master: true,
             key: Some(key),
             data: Some(data),
             error_message: None,
