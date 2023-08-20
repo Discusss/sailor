@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Links::Domain).string().not_null())
-                    .col(ColumnDef::new(Links::Category).string().not_null().default("unknown"))
+                    .col(ColumnDef::new(Links::Category).integer().not_null().default(7))
                     .col(ColumnDef::new(Links::Priority).integer().not_null().default(0))
                     .col(ColumnDef::new(Links::PublicNotes).string().not_null().default(""))
 
@@ -58,7 +58,7 @@ impl MigrationTrait for Migration {
 /**
     id serial primary key not null,
     domain text not null,
-    category varchar(255) not null default 'unknown',
+    category int not null default 7,
     priority int not null default 0,
     public_notes text not null default '',
 

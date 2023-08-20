@@ -6,11 +6,11 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub domain: String,
-    pub category: String,
+    pub category: i32,
     pub priority: i32,
     pub public_notes: String,
     pub submitted_by: String,
-    pub submitted_at: Option<DateTime>,
+    pub submitted_at: DateTime,
     pub submitted_ip: Option<String>,
     pub submitted_user_agent: Option<String>,
     pub submitted_reason: String,

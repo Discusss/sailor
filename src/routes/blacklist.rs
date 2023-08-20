@@ -97,6 +97,18 @@ pub async fn create_blacklist(db: &State<DatabaseConnection>, auth: Auth, body: 
         return Err(Status::BadRequest);
     }
 
+    match Blacklist::find()
+        .filter(blacklist::Column::Ip.contains(body.ip.clone()))
+        .one(db)
+        .await
+    {
+        Ok(ban) => match ban {
+            Some(_) => return Err(Status::Conflict),
+            None => (),
+        },
+        Err(_) => return Err(Status::InternalServerError),
+    };
+
     let now = chrono::Utc::now().naive_utc();
     let ban = blacklist::ActiveModel {
         ip: Set(body.ip.clone()),
