@@ -23,19 +23,6 @@ impl LinkType {
         }
     }
 
-    pub fn from_info(string: &String) -> LinkType {
-        match string.as_str() {
-            "Phishing" => LinkType::Phishing,
-            "Malware" => LinkType::Malware,
-            "Session Hijacking" => LinkType::SessionHijacking,
-            "Cross-site Scripting (XSS)" => LinkType::XSS,
-            "Click-Jacking" => LinkType::ClickJacking,
-            "Social Engineering" => LinkType::SocialEngineering,
-            "IP Grabber" => LinkType::IpGrabber,
-            _ => LinkType::Other,
-        }
-    }
-
     pub fn from_code(code: &i32) -> LinkType {
         match code {
             0 => LinkType::Phishing,

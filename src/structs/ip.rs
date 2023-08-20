@@ -6,6 +6,7 @@ use crate::entities::prelude::Blacklist;
 
 pub struct RemoteAddress {
     pub ip: String,
+    pub user_agent: Option<String>,
     pub is_blacklisted: bool
 }
 
@@ -16,6 +17,7 @@ impl<'r> FromRequest<'r> for RemoteAddress {
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = get_ip(request);
         let db = request.rocket().state::<DatabaseConnection>().unwrap();
+        let user_agent = get_user_agent(request);
 
         match Blacklist::find()
             .filter(blacklist::Column::Ip.contains(ip.clone()))
@@ -26,17 +28,20 @@ impl<'r> FromRequest<'r> for RemoteAddress {
                 Some(_) => (),
                 None => return Outcome::Success(RemoteAddress {
                     ip,
+                    user_agent,
                     is_blacklisted: false
                 }),
             }
             Err(_) => return Outcome::Success(RemoteAddress {
                 ip,
+                user_agent,
                 is_blacklisted: false
             }),
         };
 
         Outcome::Success(RemoteAddress {
             ip,
+            user_agent,
             is_blacklisted: true
         })
     }
@@ -56,5 +61,15 @@ pub fn get_ip(request: &Request) -> String {
             new_ip
         }
         None => ip
+    };
+}
+
+fn get_user_agent(request: &Request) -> Option<String> {
+    let headers = request.headers();
+    let user_agent = headers.get_one("User-Agent");
+
+    return match user_agent {
+        Some(user_agent) => Some(user_agent.to_string()),
+        None => None
     };
 }

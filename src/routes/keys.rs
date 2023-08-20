@@ -3,9 +3,10 @@ use rocket::serde::json::{Json, json};
 use rocket::State;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, ModelTrait, QueryFilter};
+use serde::{Deserialize, Serialize};
 use crate::entities::keys;
 use crate::entities::prelude::Keys;
-use crate::structs::auth::{ApiKey, Auth, CreateKeyBody, is_valid_key, UpdateKeyBody};
+use crate::structs::auth::{ApiKey, Auth, is_valid_key};
 use crate::utils::response::DataResponse;
 
 #[get("/keys?<key>")]
@@ -295,4 +296,24 @@ pub async fn delete_key(db: &State<DatabaseConnection>, auth: Auth, key: String)
     };
     Ok(Json(response_json))
 
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CreateKeyBody {
+    pub(crate) expires_at: String,
+    pub(crate) owner: String,
+    pub(crate) created_by: String,
+    pub(crate) notes: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UpdateKeyBody {
+    pub(crate) expires_at: Option<String>,
+    pub(crate) last_used_at: Option<String>,
+    pub(crate) owner: Option<String>,
+    pub(crate) uses: Option<i32>,
+    pub(crate) ips: Option<Vec<String>>,
+    pub(crate) user_agent: Option<String>,
+    pub(crate) created_by: Option<String>,
+    pub(crate) notes: Option<String>,
 }

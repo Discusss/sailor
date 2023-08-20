@@ -206,22 +206,14 @@ pub async fn validate_master_key(db: &DatabaseConnection) {
     };
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct CreateKeyBody {
-    pub(crate) expires_at: String,
-    pub(crate) owner: String,
-    pub(crate) created_by: String,
-    pub(crate) notes: Option<String>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct UpdateKeyBody {
-    pub(crate) expires_at: Option<String>,
-    pub(crate) last_used_at: Option<String>,
-    pub(crate) owner: Option<String>,
-    pub(crate) uses: Option<i32>,
-    pub(crate) ips: Option<Vec<String>>,
-    pub(crate) user_agent: Option<String>,
-    pub(crate) created_by: Option<String>,
-    pub(crate) notes: Option<String>,
+pub fn obfuscate_key(key: String) -> String {
+    let mut new_key = String::new();
+    for (i, c) in key.chars().enumerate() {
+        if i < key.len() - 4 {
+            new_key.push('*');
+        } else {
+            new_key.push(c);
+        }
+    }
+    return new_key;
 }

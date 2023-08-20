@@ -1,4 +1,4 @@
 pub mod prelude;
 pub mod keys;
-pub mod links;
+pub mod domains;
 pub mod blacklist;

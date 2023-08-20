@@ -1,11 +1,11 @@
-pub mod links;
+pub mod domains;
 pub mod errors;
 pub mod keys;
 pub mod blacklist;
+pub mod stats;
 
 pub fn api() -> Vec<rocket::Route> {
     return routes![
-        links::get_domain,
 
         keys::create_key,
         keys::get_key,
@@ -17,6 +17,11 @@ pub fn api() -> Vec<rocket::Route> {
         blacklist::create_blacklist,
         blacklist::update_blacklist,
         blacklist::delete_blacklist,
+
+        domains::get_domain,
+        domains::create_domain,
+        domains::update_domain,
+        domains::delete_domain,
     ];
 }
 

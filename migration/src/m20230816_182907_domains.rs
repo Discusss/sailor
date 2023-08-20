@@ -11,37 +11,37 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Links::Table)
+                    .table(Domains::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Links::Id)
+                        ColumnDef::new(Domains::Id)
                             .integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Links::Domain).string().not_null())
-                    .col(ColumnDef::new(Links::Category).integer().not_null().default(7))
-                    .col(ColumnDef::new(Links::Priority).integer().not_null().default(0))
-                    .col(ColumnDef::new(Links::PublicNotes).string().not_null().default(""))
+                    .col(ColumnDef::new(Domains::Domain).string().not_null())
+                    .col(ColumnDef::new(Domains::Category).integer().not_null().default(7))
+                    .col(ColumnDef::new(Domains::Priority).integer().not_null().default(0))
+                    .col(ColumnDef::new(Domains::PublicNotes).string().not_null().default(""))
 
-                    .col(ColumnDef::new(Links::SubmittedBy).string().not_null())
-                    .col(ColumnDef::new(Links::SubmittedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Links::SubmittedIp).string())
-                    .col(ColumnDef::new(Links::SubmittedUserAgent).string())
-                    .col(ColumnDef::new(Links::SubmittedReason).string().not_null())
+                    .col(ColumnDef::new(Domains::SubmittedBy).string().not_null())
+                    .col(ColumnDef::new(Domains::SubmittedAt).timestamp().not_null())
+                    .col(ColumnDef::new(Domains::SubmittedIp).string())
+                    .col(ColumnDef::new(Domains::SubmittedUserAgent).string())
+                    .col(ColumnDef::new(Domains::SubmittedReason).string().not_null())
 
-                    .col(ColumnDef::new(Links::ApprovedBy).string())
-                    .col(ColumnDef::new(Links::ApprovedAt).timestamp())
-                    .col(ColumnDef::new(Links::ApprovedKey).string())
+                    .col(ColumnDef::new(Domains::ApprovedBy).string())
+                    .col(ColumnDef::new(Domains::ApprovedAt).timestamp())
+                    .col(ColumnDef::new(Domains::ApprovedKey).string())
 
-                    .col(ColumnDef::new(Links::Notes).string().not_null().default(""))
-                    .col(ColumnDef::new(Links::TimesConsulted).integer().not_null().default(0))
+                    .col(ColumnDef::new(Domains::Notes).string().not_null().default(""))
+                    .col(ColumnDef::new(Domains::TimesConsulted).integer().not_null().default(0))
                     .foreign_key(
                         ForeignKey::create()
-                            .name("links_approved_key_fkey")
+                            .name("domains_approved_key_fkey")
                             .from(Keys::Table, Keys::Key)
-                            .to(Links::Table, Links::ApprovedKey)
+                            .to(Domains::Table, Domains::ApprovedKey)
                     )
                     .to_owned(),
             )
@@ -51,7 +51,7 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 
         manager
-            .drop_table(Table::drop().table(Links::Table).to_owned())
+            .drop_table(Table::drop().table(Domains::Table).to_owned())
             .await
     }
 }
@@ -76,7 +76,7 @@ impl MigrationTrait for Migration {
     times_consulted int not null default 0 -- the number of times the link has been consulted
 */
 #[derive(DeriveIden)]
-pub enum Links {
+pub enum Domains {
     Table,
     Id,
     Domain,
