@@ -2,6 +2,7 @@ use rocket::http::Status;
 use rocket::serde::json::{Json};
 use rocket::serde::json::serde_json::json;
 use rocket::{State};
+use rocket::response::status;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, ModelTrait, QueryFilter};
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
@@ -14,7 +15,7 @@ use crate::utils::parser;
 use crate::utils::response::DataResponse;
 
 #[get("/domain?<domain>")]
-pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String, auth: Auth) -> Result<Json<DataResponse>, Status> {
+pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String, auth: Auth) -> Result<status::Custom<Json<DataResponse>>, Status> {
     let db = db as &DatabaseConnection;
 
     if !parser::is_valid_domain(&domain) {
@@ -34,7 +35,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
             Some(domain_info) => domain_info,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let mut update: domains::ActiveModel = domain_info.clone().into();
@@ -89,8 +90,14 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
                 "approved_at": domain_info.approved_at,
                 "notes": domain_info.notes,
                 "times_consulted": domain_info.times_consulted,
-            })
+            });
         }
+        let response_json = DataResponse {
+            status: "207".to_string(),
+            data: json
+        };
+        return Ok(status::Custom(Status::from_code(207).unwrap(), Json(response_json)))
+
     } else {
         if !domain_info.approved_at.is_some() {
             return Err(Status::NotFound);
@@ -101,7 +108,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
         status: "200".to_string(),
         data: json
     };
-    Ok(Json(response_json))
+    Ok(status::Custom(Status::from_code(200).unwrap(), Json(response_json)))
 }
 
 #[post("/domain", data="<body>")]
@@ -263,6 +270,10 @@ pub async fn update_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         None => (),
     };
 
+    if json.is_null() || json == json!({}) {
+        return Err(Status::BadRequest);
+    }
+
     match update.update(db).await {
         Ok(_) => {},
         Err(_) => return Err(Status::InternalServerError),
@@ -297,7 +308,7 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
             Some(domain_info) => domain_info,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let domain_info = domain_to_delete.clone();
@@ -310,7 +321,7 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
     let response_json = DataResponse {
         status: "200".to_string(),
         data: json!({
-            "id": domain_info.id,
+                "id": domain_info.id,
                 "domain": domain_info.domain,
                 "category": LinkType::from_code(&domain_info.category).to_info(),
                 "priority": domain_info.priority,
@@ -327,7 +338,6 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
     //todo: detect suspicious activity and blacklist the ip or ban the api key
     Ok(Json(response_json))
 }
-
 
 #[derive(Validator)]
 #[validator(domain(ipv4(NotAllow), local(NotAllow), at_least_two_labels(Allow), port(NotAllow)))]

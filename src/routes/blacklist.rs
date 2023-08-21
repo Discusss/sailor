@@ -31,6 +31,7 @@ pub async fn get_all_blacklist(db: &State<DatabaseConnection>, auth: Auth) -> Re
             json!({
                 "ip": ban.ip,
                 "reason": ban.reason,
+                "date": ban.created_at,
             })
         }).collect()
     };
@@ -38,7 +39,7 @@ pub async fn get_all_blacklist(db: &State<DatabaseConnection>, auth: Auth) -> Re
     Ok(Json(response_json))
 }
 
-#[get("/blacklist?<ip>")]
+#[get("/blacklist/<ip>")]
 pub async fn get_blacklist(db: &State<DatabaseConnection>, auth: Auth, ip: String) -> Result<Json<DataResponse>, Status> {
     let db = db as &DatabaseConnection;
 
@@ -55,7 +56,7 @@ pub async fn get_blacklist(db: &State<DatabaseConnection>, auth: Auth, ip: Strin
             Some(ban) => ban,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let response_json = DataResponse {
@@ -92,7 +93,7 @@ pub async fn check_blacklist(db: &State<DatabaseConnection>, remote: RemoteAddre
             Some(ban) => ban,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let response_json = DataResponse {

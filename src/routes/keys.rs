@@ -30,7 +30,7 @@ pub async fn get_key(db: &State<DatabaseConnection>, auth: Auth, key: String) ->
             Some(key_info) => key_info,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let response_json = DataResponse {
@@ -62,7 +62,7 @@ pub async fn create_key(db: &State<DatabaseConnection>, auth: Auth, body: Json<C
 
     let expires_at = match chrono::DateTime::parse_from_rfc3339(&body.expires_at) {
         Ok(expires_at) => {
-            if expires_at.naive_utc() < chrono::Utc::now().naive_utc() || expires_at.naive_utc() > chrono::Utc::now().naive_utc() + chrono::Duration::days(365) {
+            if expires_at.naive_utc() < chrono::Utc::now().naive_utc() || expires_at.naive_utc() > chrono::Utc::now().naive_utc() + chrono::Duration::days(365*5) {
                 return Err(Status::BadRequest);
             }
             expires_at
@@ -133,7 +133,7 @@ pub async fn update_key(db: &State<DatabaseConnection>, auth: Auth, key: String,
             Some(key_info) => key_info.into(),
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let mut json = json!({});
@@ -265,7 +265,7 @@ pub async fn delete_key(db: &State<DatabaseConnection>, auth: Auth, key: String)
             Some(key_info) => key_info,
             None => return Err(Status::NotFound),
         },
-        Err(_) => return Err(Status::NotFound),
+        Err(_) => return Err(Status::InternalServerError),
     };
 
     let key_info = key_to_delete.clone();

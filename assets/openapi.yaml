@@ -1,0 +1,1323 @@
+openapi: 3.1.0
+
+info:
+    title: Phishing API
+    summary: Una base de datos con miles enlaces maliciosos.
+    description: Una base de datos colaborativa con enlaces maliciosos centrada pero no dedicada en la moderación de Discord.
+    termsOfService: 'https://discusss.gitbook.io/phishing/informacion'
+    contact:
+      name: 'Discusss'
+      url: 'https://discord.gg/SJqrGP7'
+      email: 'admin@lacabra.app'
+    license:
+      name: GPL-3.0
+      url: 'https://www.gnu.org/licenses/gpl-3.0.html'
+    version: 0.0.1-dev
+
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+
+servers:
+  - url: 'https://phishing.lacabra.app/api'
+    description: 'Servidor principal'
+
+paths:
+  /blacklist:
+    get:
+      summary: 'Obtener la lista negra'
+      description: 'Obtener la lista negra de usuarios que han sido vetados del uso de la base de datos'
+      operationId: 'getBlacklist'
+      tags:
+        - 'Blacklist'
+      security:
+        - masterAuth: []
+      responses:
+        '200':
+          description: 'Lista negra obtenida'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: array
+                    description: 'Lista negra'
+                    items:
+                      type: object
+                      properties:
+                        ip:
+                          type: string
+                          description: 'IP del usuario'
+                        reason:
+                          type: string
+                          description: 'Razón del veto'
+                        date:
+                          type: string
+                          description: 'Fecha del inicio veto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: 'Añadir a la lista negra'
+      description: 'Añadir a la lista negra un usuario con su IP'
+      operationId: 'addBlacklist'
+      tags:
+        - 'Blacklist'
+      security:
+        - masterAuth: []
+      requestBody:
+        description: 'Datos del usuario a añadir'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+              properties:
+                ip:
+                  type: string
+                  description: 'IP del usuario'
+                reason:
+                  type: string
+                  description: 'Razón del veto'
+                expires_at:
+                  type: string
+                  description: 'Fecha de expiración del veto, en formato RFC 3339'
+                created_by:
+                  type: string
+                  description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                notes:
+                  type: string
+                  description: 'Notas sobre el veto'
+      responses:
+        '200':
+            description: 'Usuario añadido a la lista negra'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (200)'
+                    data:
+                        type: object
+                        description: 'Usuario añadido'
+                        properties:
+                          ip:
+                            type: string
+                            description: 'IP del usuario'
+                          reason:
+                            type: string
+                            description: 'Razón del veto'
+                          expires_at:
+                            type: string
+                            description: 'Fecha de expiración del veto, en formato RFC 3339'
+                          created_at:
+                            type: string
+                            description: 'Fecha de creación del veto, en formato RFC 3339'
+                          created_by:
+                            type: string
+                            description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                          notes:
+                            type: string
+                            description: 'Notas sobre el veto'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+            description: 'El usuario ya está en la lista negra'
+            content:
+                application/json:
+                    schema:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        description: 'Estado de la petición (409)'
+                      message:
+                        type: string
+                        description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+        summary: 'Modificar un veto de la lista negra'
+        description: 'Modificar un veto de la lista negra con su ID de veto'
+        operationId: 'patchBlacklist'
+        tags:
+          - 'Blacklist'
+        security:
+          - masterAuth: []
+        parameters:
+          - name: 'ip'
+            in: 'path'
+            description: 'IP del usuario a modificar'
+            required: true
+            allowEmptyValue: false
+            schema:
+                type:
+                  - string
+        requestBody:
+            description: 'Datos del veto a modificar'
+            required: true
+            content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      reason:
+                        type: string
+                        description: 'Razón del veto'
+                      expires_at:
+                        type: string
+                        description: 'Fecha de expiración del veto, en formato RFC 3339'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el veto'
+        responses:
+            '200':
+                description: 'Veto modificado'
+                content:
+                  application/json:
+                    schema:
+                    type: object
+                    properties:
+                        status:
+                          type: string
+                          description: 'Estado de la petición (200)'
+                        data:
+                          type: object
+                          description: 'Veto modificado'
+                        properties:
+                            reason:
+                              type: string
+                              description: 'Razón del veto, solo si se ha modificado'
+                            expires_at:
+                              type: string
+                              description: 'Fecha de expiración del veto, en formato RFC 3339, solo si se ha modificado'
+                            created_at:
+                              type: string
+                              description: 'Fecha de creación del veto, en formato RFC 3339, solo si se ha modificado'
+                            created_by:
+                              type: string
+                              description: 'Nombre del usuario que ha añadido al usuario a la lista negra, solo si se ha modificado'
+                            notes:
+                              type: string
+                              description: 'Notas sobre el veto, solo si se ha modificado'
+            '400':
+              $ref: '#/components/responses/BadRequestError'
+            '401':
+              $ref: '#/components/responses/UnauthorizedError'
+            '404':
+                description: 'Veto no encontrado'
+                content:
+                  application/json:
+                    schema:
+                    type: object
+                    properties:
+                        status:
+                          type: string
+                          description: 'Estado de la petición (404)'
+                        message:
+                          type: string
+                          description: 'Mensaje de error'
+            '500':
+              $ref: '#/components/responses/InternalServerError'
+
+    delete:
+        summary: 'Eliminar un veto de la lista negra'
+        description: 'Eliminar un veto de la lista negra con su ID de veto'
+        operationId: 'deleteBlacklist'
+        tags:
+          - 'Blacklist'
+        security:
+          - masterAuth: []
+        parameters:
+            - name: 'ip'
+              in: 'path'
+              description: 'IP del usuario a eliminar'
+              required: true
+              allowEmptyValue: false
+              schema:
+                type:
+                  - string
+        responses:
+            '200':
+                description: 'Veto eliminado'
+                content:
+                  application/json:
+                    schema:
+                    type: object
+                    properties:
+                        status:
+                          type: string
+                          description: 'Estado de la petición (200)'
+                        data:
+                          type: object
+                          description: 'Veto eliminado'
+                          properties:
+                            ip:
+                              type: string
+                              description: 'IP del usuario'
+                            reason:
+                              type: string
+                              description: 'Razón del veto'
+                            expires_at:
+                              type: string
+                              description: 'Fecha de expiración del veto, en formato RFC 3339'
+                            created_at:
+                              type: string
+                              description: 'Fecha de creación del veto, en formato RFC 3339'
+                            created_by:
+                              type: string
+                              description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                            notes:
+                              type: string
+                              description: 'Notas sobre el veto'
+            '400':
+              $ref: '#/components/responses/BadRequestError'
+            '401':
+              $ref: '#/components/responses/UnauthorizedError'
+            '404':
+                description: 'Veto no encontrado'
+                content:
+                  application/json:
+                    schema:
+                    type: object
+                    properties:
+                        status:
+                          type: string
+                          description: 'Estado de la petición (404)'
+                        message:
+                          type: string
+                          description: 'Mensaje de error'
+            '500':
+                $ref: '#/components/responses/InternalServerError'
+
+  /blacklist/check:
+    get:
+      summary: 'Comprobar si la IP del usuario que ha hecho la petición está en la lista negra'
+      description: 'Comprobar si tu IP está en la lista negra'
+      operationId: 'checkBlacklist'
+      tags:
+        - 'Blacklist'
+      responses:
+        '200':
+          description: 'Usuario en la lista negra'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Usuario en la lista negra'
+                    properties:
+                      ip:
+                        type: string
+                        description: 'IP del usuario'
+                      reason:
+                        type: string
+                        description: 'Razón del veto'
+                      expires_at:
+                        type: string
+                        description: 'Fecha de expiración del veto, en formato RFC 3339'
+                      created_at:
+                        type: string
+                        description: 'Fecha de creación del veto, en formato RFC 3339'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el veto'
+        '404':
+            description: 'Usuario no encontrado en la lista negra'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (404)'
+                    message:
+                        type: string
+                        description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /blacklist/{ip}:
+    get:
+      summary: 'Obtener un veto de la lista negra'
+      description: 'Obtener un veto de la lista negra con la IP del usuario'
+      operationId: 'getBlacklistIp'
+      tags:
+        - 'Blacklist'
+      security:
+        - masterAuth: []
+      parameters:
+        - name: 'ip'
+          in: 'path'
+          description: 'IP del usuario a obtener'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - string
+      responses:
+        '200':
+          description: 'Veto obtenido'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Veto obtenido'
+                    properties:
+                      ip:
+                        type: string
+                        description: 'IP del usuario'
+                      reason:
+                        type: string
+                        description: 'Razón del veto'
+                      expires_at:
+                        type: string
+                        description: 'Fecha de expiración del veto, en formato RFC 3339'
+                      created_at:
+                        type: string
+                        description: 'Fecha de creación del veto, en formato RFC 3339'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido al usuario a la lista negra'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el veto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+            description: 'Veto no encontrado'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (404)'
+                    message:
+                        type: string
+                        description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /domain:
+    get:
+      summary: 'Obtener información sobre un dominio en la base de datos'
+      description: 'Obtener información sobre un dominio en la base de datos dado su nombre'
+      operationId: 'getDomain'
+      tags:
+        - 'Domain'
+      parameters:
+        - name: 'domain'
+          in: 'query'
+          description: 'Nombre del dominio a obtener'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - string
+      responses:
+        '200':
+          description: 'Dominio aprobado obtenido'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Información del dominio'
+                    properties:
+                      domain:
+                        type: string
+                        description: 'Dominio'
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      submitted_at:
+                        type: string
+                        description: 'Fecha de creación del dominio, en formato RFC 3339'
+        '207':
+          description: 'Dominio obtenido con una clave de acceso'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (207)'
+                  data:
+                    type: object
+                    description: 'Información avanzada del dominio'
+                    properties:
+                      id:
+                        type: string
+                        description: 'ID del dominio'
+                      domain:
+                        type: string
+                        description: 'Dominio'
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      public_notes:
+                        type: string
+                        description: 'Notas públicas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      submitted_at:
+                        type: string
+                        description: 'Fecha de creación del dominio, en formato RFC 3339'
+                      submitted_reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio'
+                      approved_by:
+                        type: string | null
+                        description: 'Nombre del usuario que ha aprobado el dominio'
+                      approved_at:
+                        type: string | null
+                        description: 'Fecha de aprobación del dominio, en formato RFC 3339'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      times_consulted:
+                        type: integer
+                        description: 'Veces que se ha consultado el dominio'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/BlacklistedError'
+        '404':
+            description: 'Dominio no encontrado'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (404)'
+                    message:
+                        type: string
+                        description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+        summary: 'Añadir un dominio a la base de datos (pendiente de aprobación)'
+        description: 'Añadir un dominio a la base de datos (pendiente de aprobación)'
+        operationId: 'addDomain'
+        tags:
+          - 'Domain'
+        requestBody:
+            description: 'Datos del dominio a añadir'
+            required: true
+            content:
+                application/json:
+                  schema:
+                    type: object
+                    required:
+                      - domain
+                      - submitted_by
+                      - reason
+                    properties:
+                      domain:
+                        type: string
+                        description: 'Dominio'
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio'
+        responses:
+          '200':
+            description: 'Dominio añadido'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (200)'
+                    data:
+                        type: object
+                        description: 'Dominio añadido'
+                        properties:
+                          domain:
+                            type: string
+                            description: 'Dominio'
+                          category:
+                            type: string
+                            description: 'Categoría del dominio'
+                          priority:
+                            type: integer
+                            description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                          notes:
+                            type: string
+                            description: 'Notas sobre el dominio'
+                          submitted_by:
+                            type: string
+                            description: 'Nombre del usuario que ha añadido el dominio'
+                          submitted_at:
+                            type: string
+                            description: 'Fecha de creación del dominio, en formato RFC 3339'
+          '400':
+            $ref: '#/components/responses/BadRequestError'
+          '403':
+            $ref: '#/components/responses/BlacklistedError'
+          '404':
+            description: 'Dominio no encontrado'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (404)'
+                    message:
+                        type: string
+                        description: 'Mensaje de error'
+          '409':
+            description: 'Dominio ya existente'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (409)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+    patch:
+        summary: 'Modificar un dominio de la base de datos'
+        description: 'Modificar un dominio de la base de datos con su ID de dominio'
+        operationId: 'patchDomain'
+        tags:
+          - 'Domain'
+        security:
+          - masterAuth: []
+        parameters:
+          - name: 'id'
+            in: 'path'
+            description: 'ID del dominio a modificar'
+            required: true
+            allowEmptyValue: false
+            schema:
+                type:
+                  - integer
+        requestBody:
+            description: 'Datos del dominio a modificar'
+            required: true
+            content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      public_notes:
+                        type: string
+                        description: 'Notas públicas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      submitted_reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio'
+                      approved_by:
+                        type: string | null
+                        description: 'Nombre del usuario que ha aprobado el dominio'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      times_consulted:
+                        type: integer
+                        description: 'Veces que se ha consultado el dominio'
+        responses:
+          '200':
+            description: 'Dominio modificado'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Dominio modificado'
+                    properties:
+                      category:
+                        type: string
+                        description: 'Categoría del dominio, solo si se ha modificado'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal, solo si se ha modificado'
+                      public_notes:
+                        type: string
+                        description: 'Notas públicas sobre el dominio, solo si se ha modificado'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio, solo si se ha modificado'
+                      submitted_reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio, solo si se ha modificado'
+                      approved_by:
+                        type: string
+                        description: 'Nombre del usuario que ha aprobado el dominio, solo si se ha modificado'
+                      approved_at:
+                        type: string
+                        description: 'Fecha de aprobación del dominio, en formato RFC 3339, solo si se ha modificado el campo approved_by'
+                      approved_key:
+                        type: string
+                        description: 'Clave (ofuscada) del usuario que ha aprobado el dominio, solo si se ha modificado el campo approved_by'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio, solo si se ha modificado'
+                      times_consulted:
+                        type: integer
+                        description: 'Veces que se ha consultado el dominio, solo si se ha modificado'
+          '400':
+            $ref: '#/components/responses/BadRequestError'
+          '401':
+            $ref: '#/components/responses/UnauthorizedError'
+          '403':
+            $ref: '#/components/responses/BlacklistedError'
+          '404':
+            description: 'Dominio no encontrado'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: 'Eliminar un dominio de la base de datos'
+      description: 'Eliminar un dominio de la base de datos con su ID de dominio'
+      operationId: 'deleteDomain'
+      tags:
+        - 'Domain'
+      security:
+        - masterAuth: []
+      parameters:
+        - name: 'id'
+          in: 'path'
+          description: 'ID del dominio a eliminar'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - integer
+      responses:
+        '200':
+          description: 'Dominio eliminado'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Dominio eliminado'
+                    properties:
+                      id:
+                        type: integer
+                        description: 'ID del dominio'
+                      domain:
+                        type: string
+                        description: 'Dominio'
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      public_notes:
+                        type: string
+                        description: 'Notas públicas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      submitted_at:
+                        type: string
+                        description: 'Fecha de creación del dominio, en formato RFC 3339'
+                      submitted_reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio'
+                      approved_by:
+                        type: string | null
+                        description: 'Nombre del usuario que ha aprobado el dominio'
+                      approved_at:
+                        type: string | null
+                        description: 'Fecha de aprobación del dominio, en formato RFC 3339'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      times_consulted:
+                        type: integer
+                        description: 'Veces que se ha consultado el dominio'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/BlacklistedError'
+        '404':
+            description: 'Dominio no encontrado'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (404)'
+                    message:
+                        type: string
+                        description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /stats:
+    get:
+        summary: 'Obtener estadísticas de la base de datos'
+        description: 'Obtener estadísticas de la base de datos'
+        operationId: 'getStats'
+        tags:
+            - 'Stats'
+        responses:
+          '200':
+            description: 'Estadísticas obtenidas'
+            content:
+              application/json:
+                schema:
+                    type: object
+                    properties:
+                    status:
+                        type: string
+                        description: 'Estado de la petición (200)'
+                    data:
+                        type: object
+                        description: 'Estadísticas obtenidas'
+                        properties:
+                          total_domains:
+                            type: integer
+                            description: 'Dominios en la base de datos'
+                          blacklisted_count:
+                            type: integer
+                            description: 'Usuarios en la lista negra'
+                          top_5_domains:
+                            type: array
+                            description: 'Top 5 de dominios más consultados'
+                            items:
+                              type: object
+                              properties:
+                                domain:
+                                  type: string
+                                  description: 'Dominio'
+                                times_consulted:
+                                  type: integer
+                                  description: 'Veces que se ha consultado el dominio'
+
+  /keys:
+    get:
+      summary: 'Obtener información sobre una clave de acceso'
+      description: 'Obtener información sobre una clave de acceso dada su clave'
+      operationId: 'getKey'
+      tags:
+        - 'Key'
+      parameters:
+        - name: 'key'
+          in: 'query'
+          description: 'Clave de acceso a obtener'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - string
+      security:
+        - masterAuth: []
+      responses:
+        '200':
+          description: 'Clave obtenida'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Información de la clave'
+                    properties:
+                      key:
+                        type: string
+                        description: 'Clave de acceso'
+                      created_at:
+                        type: string
+                        description: 'Fecha de creación de la clave, en formato RFC 3339'
+                      expires_at:
+                        type: integer
+                        description: 'Fecha de expiración de la clave, en formato RFC 3339'
+                      last_used_at:
+                        type: string
+                        description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339'
+                      owner:
+                        type: string
+                        description: 'Nombre del usuario dueño de la clave'
+                      uses:
+                        type: integer
+                        description: 'Veces que se ha usado la clave'
+                      ips:
+                        type: array
+                        description: 'IPs desde las que se ha usado la clave'
+                        items:
+                          type: string
+                          description: 'IP'
+                      user_agent:
+                        type: string
+                        description: 'User-Agent desde el que se ha usado la clave por última vez'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha creado la clave'
+                      notes:
+                        type: string
+                        description: 'Notas sobre la clave'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: 'Clave no encontrada'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                status:
+                  type: string
+                  description: 'Estado de la petición (404)'
+                message:
+                  type: string
+                  description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: 'Añadir una clave de acceso'
+      description: 'Añadir una clave de acceso'
+      operationId: 'addKey'
+      tags:
+        - 'Key'
+      security:
+        - masterAuth: [ ]
+      requestBody:
+        description: 'Datos de la clave a añadir'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - expires_at
+                - owner
+                - created_by
+              properties:
+                expires_at:
+                  type: string
+                  description: 'Fecha de expiración de la clave, en formato RFC 3339. Máximo 5 año'
+                owner:
+                  type: string
+                  description: 'Nombre del usuario dueño de la clave'
+                created_by:
+                  type: integer
+                  description: 'Nombre del usuario que ha creado la clave'
+                notes:
+                  type: string
+                  description: 'Notas sobre la clave'
+      responses:
+        '200':
+          description: 'Clave añadida'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                status:
+                  type: string
+                  description: 'Estado de la petición (200)'
+                data:
+                  type: object
+                  description: 'Clave añadida'
+                  properties:
+                    key:
+                      type: string
+                      description: 'Clave de acceso'
+                    created_at:
+                      type: string
+                      description: 'Fecha de creación de la clave, en formato RFC 3339'
+                    expires_at:
+                      type: integer
+                      description: 'Fecha de expiración de la clave, en formato RFC 3339'
+                    owner:
+                      type: string
+                      description: 'Nombre del usuario dueño de la clave'
+                    created_by:
+                      type: string
+                      description: 'Nombre del usuario que ha creado la clave'
+                    notes:
+                      type: string
+                      description: 'Notas sobre la clave'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: 'Modificar una clave de acceso'
+      description: 'Modificar una clave de acceso con su clave'
+      operationId: 'patchKey'
+      tags:
+        - 'Key'
+      security:
+        - masterAuth: [ ]
+      parameters:
+        - name: 'key'
+          in: 'path'
+          description: 'Clave de acceso a modificar'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - string
+      requestBody:
+        description: 'Datos de la clave a modificar'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expires_at:
+                  type: string
+                  description: 'Fecha de expiración de la clave, en formato RFC 3339. Máximo 5 año'
+                last_used_at:
+                  type: integer
+                  description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339'
+                owner:
+                  type: string
+                  description: 'Nombre del usuario dueño de la clave'
+                uses:
+                  type: integer
+                  description: 'Veces que se ha usado la clave'
+                ips:
+                  type: array
+                  description: 'IPs desde las que se ha usado la clave'
+                  items:
+                    type: string
+                    description: 'IP'
+                user_agent:
+                  type: string
+                  description: 'User-Agent desde el que se ha usado la clave por última vez'
+                created_by:
+                  type: string
+                  description: 'Nombre del usuario que ha creado la clave'
+                notes:
+                  type: integer
+                  description: 'Notas sobre la clave'
+      responses:
+        '200':
+          description: 'Clave modificada'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                status:
+                  type: string
+                  description: 'Estado de la petición (200)'
+                data:
+                  type: object
+                  description: 'Dominio modificado'
+                  properties:
+                    expires_at:
+                      type: string
+                      description: 'Fecha de expiración de la clave, en formato RFC 3339. Máximo 5 año, solo si se ha modificado'
+                    last_used_at:
+                      type: integer
+                      description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339, solo si se ha modificado'
+                    owner:
+                      type: string
+                      description: 'Nombre del usuario dueño de la clave, solo si se ha modificado'
+                    uses:
+                      type: integer
+                      description: 'Veces que se ha usado la clave, solo si se ha modificado'
+                    ips:
+                      type: array
+                      description: 'IPs desde las que se ha usado la clave, solo si se ha modificado'
+                      items:
+                        type: string
+                        description: 'IP'
+                    user_agent:
+                      type: string
+                      description: 'User-Agent desde el que se ha usado la clave por última vez, solo si se ha modificado'
+                    created_by:
+                      type: string
+                      description: 'Nombre del usuario que ha creado la clave, solo si se ha modificado'
+                    notes:
+                      type: integer
+                      description: 'Notas sobre la clave, solo si se ha modificado'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: 'Clave no encontrada'
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: 'Estado de la petición (404)'
+                    message:
+                      type: string
+                      description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: 'Eliminar una clave de acceso'
+      description: 'Eliminar una clave de acceso con su clave'
+      operationId: 'deleteKey'
+      tags:
+        - 'Key'
+      security:
+        - masterAuth: [ ]
+      parameters:
+        - name: 'key'
+          in: 'path'
+          description: 'Clave de acceso a eliminar'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type:
+              - string
+      responses:
+        '200':
+          description: 'Clave eliminada'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Clave eliminada'
+                    properties:
+                      key:
+                        type: string
+                        description: 'Clave de acceso'
+                      created_at:
+                        type: string
+                        description: 'Fecha de creación de la clave, en formato RFC 3339'
+                      expires_at:
+                        type: integer
+                        description: 'Fecha de expiración de la clave, en formato RFC 3339'
+                      last_used_at:
+                        type: string
+                        description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339'
+                      owner:
+                        type: string
+                        description: 'Nombre del usuario dueño de la clave'
+                      uses:
+                        type: integer
+                        description: 'Veces que se ha usado la clave'
+                      ips:
+                        type: array
+                        description: 'IPs desde las que se ha usado la clave'
+                        items:
+                          type: string
+                          description: 'IP'
+                      user_agent:
+                        type: string
+                        description: 'User-Agent desde el que se ha usado la clave por última vez'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha creado la clave'
+                      notes:
+                        type: string
+                        description: 'Notas sobre la clave'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: 'Clave no encontrada'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: UUID
+      description: 'Token de autenticación de usuario'
+    masterAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: UUID
+      description: 'Token de autenticación de administrador, solo para uso interno'
+  responses:
+    UnauthorizedError:
+      description: 'No autorizado'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: 'Estado de la petición (401)'
+              message:
+                type: string
+                description: 'Mensaje de error'
+    InternalServerError:
+      description: 'Error interno del servidor'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: 'Estado de la petición (500)'
+              message:
+                type: string
+                description: 'Mensaje de error'
+    BadRequestError:
+      description: 'Petición incorrecta o vacía'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: 'Estado de la petición (400)'
+              message:
+                type: string
+                description: 'Mensaje de error'
+    BlacklistedError:
+      description: 'El usuario está en la lista negra'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: 'Estado de la petición (403)'
+              message:
+                type: string
+                description: 'Mensaje de error'
+
+externalDocs:
+  description: Find out more about this Phishing API
+  url: 'https://discusss.gitbook.io/phishing'
