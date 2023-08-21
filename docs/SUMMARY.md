@@ -14,5 +14,6 @@
 
 * [API Reference](reference/api-reference/README.md)
   * [Domains](reference/api-reference/domains.md)
-  * [Pets](reference/api-reference/pets.md)
-  * [Users](reference/api-reference/users.md)
+  * [Blacklist](reference/api-reference/blacklist.md)
+  * [Keys](reference/api-reference/keys.md)
+  * [Stats](reference/api-reference/stats.md)
