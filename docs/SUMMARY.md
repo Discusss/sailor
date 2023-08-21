@@ -1,7 +1,14 @@
 # Table of contents
 
 * [👋 Bienvenido!](README.md)
-* [Quick Start](quick-start.md)
+* [⚙ Quick Start](quick-start.md)
+* [ℹ Información](informacion.md)
+
+## colaborar
+
+* [🖥 Open source](colaborar/open-source.md)
+* [📌 Añadir dominios](colaborar/anadir-dominios.md)
+* [💂 Convertirse en revisor](colaborar/convertirse-en-revisor.md)
 
 ## Reference
 

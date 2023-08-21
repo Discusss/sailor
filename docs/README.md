@@ -6,22 +6,34 @@ coverY: 0
 
 # 👋 Bienvenido!
 
-## Welcome to MyAPI
+{% hint style="warning" %}
+Esta **API** es experimental y es muy posible que se hagan cambios tanto el la propia API como en la documentación.
+{% endhint %}
 
-Welcome to MyAPI! Here you'll find all the documentation you need to get up and running with the MyAPI API.
+## ¿Qué es esta API?
 
-## Want to jump right in?
+Esta **API** es un proyecto colaborativo que se encarga de guardar, listar y recopilar enlaces maliciosos por internet, para ser usada en aplicaciones de auto-moderación y mantener a los usuarios seguros. Este proyecto está centrado, pero no dedicado a la **moderación de servidores de Discord** con el uso de **bots**.&#x20;
 
-Feeling like an eager beaver? Jump in to the quick start docs and get making your first request:
+## ¿Cómo puedo colaborar?
+
+Este proyecto es abierto, así que si quieres colaborar tenemos buenas noticias!
+
+{% content-ref url="colaborar/open-source.md" %}
+[open-source.md](colaborar/open-source.md)
+{% endcontent-ref %}
+
+{% content-ref url="colaborar/anadir-dominios.md" %}
+[anadir-dominios.md](colaborar/anadir-dominios.md)
+{% endcontent-ref %}
+
+{% content-ref url="colaborar/convertirse-en-revisor.md" %}
+[convertirse-en-revisor.md](colaborar/convertirse-en-revisor.md)
+{% endcontent-ref %}
+
+## ¿Cómo puedo usar esta API en mis proyectos?
+
+Aquí tienes una guía básica de como empezar a usar y contribuir a esta API:
 
 {% content-ref url="quick-start.md" %}
 [quick-start.md](quick-start.md)
-{% endcontent-ref %}
-
-## Want to deep dive?
-
-Dive a little deeper and start exploring our API reference to get an idea of everything that's possible with the API:
-
-{% content-ref url="reference/api-reference/" %}
-[api-reference](reference/api-reference/)
 {% endcontent-ref %}
