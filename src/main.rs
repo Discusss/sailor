@@ -23,11 +23,6 @@ mod structs;
 
 /*
 
-    GET /api/link?domain=example.com --> Comprobar si existe el dominio en la base de datos
-    POST /api/link (with JSON body) --> Insertar el dominio en la base de datos (pero sin aprobar)
-    POST /api/link/approve (with JSON body, needs auth) --> Aprobar el dominio en la base de datos
-    POST /api/link/reject (with JSON body, needs auth) --> Rechazar el dominio en la base de datos (borrarlo)
-
     ==== Webhook ====
     POST /webhook (with JSON body) --> Mandar al bot de discord información sobre un nuevo dominio
 

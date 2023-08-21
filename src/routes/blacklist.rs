@@ -10,6 +10,7 @@ use crate::entities::prelude::Blacklist;
 use crate::structs::auth::Auth;
 use crate::utils::response::{DataResponse, DataResponseArray};
 use validators::prelude::*;
+use crate::structs::ip::RemoteAddress;
 
 #[get("/blacklist")]
 pub async fn get_all_blacklist(db: &State<DatabaseConnection>, auth: Auth) -> Result<Json<DataResponseArray>, Status> {
@@ -44,6 +45,43 @@ pub async fn get_blacklist(db: &State<DatabaseConnection>, auth: Auth, ip: Strin
     if !auth.is_valid || !auth.is_master {
         return Err(Status::Unauthorized);
     }
+
+    let ban = match Blacklist::find()
+        .filter(blacklist::Column::Ip.contains(ip))
+        .one(db)
+        .await
+    {
+        Ok(ban) => match ban {
+            Some(ban) => ban,
+            None => return Err(Status::NotFound),
+        },
+        Err(_) => return Err(Status::NotFound),
+    };
+
+    let response_json = DataResponse {
+        status: "200".to_string(),
+        data: json!({
+            "ip": ban.ip,
+            "reason": ban.reason,
+            "expires_at": ban.expires_at,
+            "created_at": ban.created_at,
+            "created_by": ban.created_by,
+            "notes": ban.notes,
+        })
+    };
+
+    Ok(Json(response_json))
+}
+
+#[get("/blacklist/check")]
+pub async fn check_blacklist(db: &State<DatabaseConnection>, remote: RemoteAddress)-> Result<Json<DataResponse>, Status> {
+    let db = db as &DatabaseConnection;
+
+    if !remote.is_blacklisted {
+        return Err(Status::NotFound);
+    }
+
+    let ip = remote.ip;
 
     let ban = match Blacklist::find()
         .filter(blacklist::Column::Ip.contains(ip))

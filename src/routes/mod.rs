@@ -14,6 +14,7 @@ pub fn api() -> Vec<rocket::Route> {
 
         blacklist::get_all_blacklist,
         blacklist::get_blacklist,
+        blacklist::check_blacklist,
         blacklist::create_blacklist,
         blacklist::update_blacklist,
         blacklist::delete_blacklist,
