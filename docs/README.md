@@ -1,4 +1,10 @@
-# Welcome!
+---
+description: Documentación oficial de la API de Phishing de Discusss
+cover: .gitbook/assets/welcome-banner.png
+coverY: 0
+---
+
+# 👋 Bienvenido!
 
 ## Welcome to MyAPI
 
