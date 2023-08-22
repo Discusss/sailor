@@ -541,12 +541,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -594,31 +594,31 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
-                data:
-                  type: object
-                  description: 'Dominio añadido'
-                  properties:
-                    domain:
-                      type: string
-                      description: 'Dominio'
-                    category:
-                      type: string
-                      description: 'Categoría del dominio'
-                    priority:
-                      type: integer
-                      description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
-                    notes:
-                      type: string
-                      description: 'Notas sobre el dominio'
-                    submitted_by:
-                      type: string
-                      description: 'Nombre del usuario que ha añadido el dominio'
-                    submitted_at:
-                      type: string
-                      description: 'Fecha de creación del dominio, en formato RFC 3339'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Dominio añadido'
+                    properties:
+                      domain:
+                        type: string
+                        description: 'Dominio'
+                      category:
+                        type: string
+                        description: 'Categoría del dominio'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio'
+                      submitted_at:
+                        type: string
+                        description: 'Fecha de creación del dominio, en formato RFC 3339'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '403':
@@ -630,12 +630,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '409':
           description: 'Dominio ya existente'
           content:
@@ -643,12 +643,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (409)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (409)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -710,43 +710,43 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
-                data:
-                  type: object
-                  description: 'Dominio modificado'
-                  properties:
-                    category:
-                      type: string
-                      description: 'Categoría del dominio, solo si se ha modificado'
-                    priority:
-                      type: integer
-                      description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal, solo si se ha modificado'
-                    public_notes:
-                      type: string
-                      description: 'Notas públicas sobre el dominio, solo si se ha modificado'
-                    submitted_by:
-                      type: string
-                      description: 'Nombre del usuario que ha añadido el dominio, solo si se ha modificado'
-                    submitted_reason:
-                      type: string
-                      description: 'Razón dada por el usuario por la que se ha añadido el dominio, solo si se ha modificado'
-                    approved_by:
-                      type: string
-                      description: 'Nombre del usuario que ha aprobado el dominio, solo si se ha modificado'
-                    approved_at:
-                      type: string
-                      description: 'Fecha de aprobación del dominio, en formato RFC 3339, solo si se ha modificado el campo approved_by'
-                    approved_key:
-                      type: string
-                      description: 'Clave (ofuscada) del usuario que ha aprobado el dominio, solo si se ha modificado el campo approved_by'
-                    notes:
-                      type: string
-                      description: 'Notas sobre el dominio, solo si se ha modificado'
-                    times_consulted:
-                      type: integer
-                      description: 'Veces que se ha consultado el dominio, solo si se ha modificado'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Dominio modificado'
+                    properties:
+                      category:
+                        type: string
+                        description: 'Categoría del dominio, solo si se ha modificado'
+                      priority:
+                        type: integer
+                        description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal, solo si se ha modificado'
+                      public_notes:
+                        type: string
+                        description: 'Notas públicas sobre el dominio, solo si se ha modificado'
+                      submitted_by:
+                        type: string
+                        description: 'Nombre del usuario que ha añadido el dominio, solo si se ha modificado'
+                      submitted_reason:
+                        type: string
+                        description: 'Razón dada por el usuario por la que se ha añadido el dominio, solo si se ha modificado'
+                      approved_by:
+                        type: string
+                        description: 'Nombre del usuario que ha aprobado el dominio, solo si se ha modificado'
+                      approved_at:
+                        type: string
+                        description: 'Fecha de aprobación del dominio, en formato RFC 3339, solo si se ha modificado el campo approved_by'
+                      approved_key:
+                        type: string
+                        description: 'Clave (ofuscada) del usuario que ha aprobado el dominio, solo si se ha modificado el campo approved_by'
+                      notes:
+                        type: string
+                        description: 'Notas sobre el dominio, solo si se ha modificado'
+                      times_consulted:
+                        type: integer
+                        description: 'Veces que se ha consultado el dominio, solo si se ha modificado'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -760,12 +760,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -850,12 +850,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -874,31 +874,31 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
-                data:
-                  type: object
-                  description: 'Estadísticas obtenidas'
-                  properties:
-                    total_domains:
-                      type: integer
-                      description: 'Dominios en la base de datos'
-                    blacklisted_count:
-                      type: integer
-                      description: 'Usuarios en la lista negra'
-                    top_5_domains:
-                      type: array
-                      description: 'Top 5 de dominios más consultados'
-                      items:
-                        type: object
-                        properties:
-                          domain:
-                            type: string
-                            description: 'Dominio'
-                          times_consulted:
-                            type: integer
-                            description: 'Veces que se ha consultado el dominio'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Estadísticas obtenidas'
+                    properties:
+                      total_domains:
+                        type: integer
+                        description: 'Dominios en la base de datos'
+                      blacklisted_count:
+                        type: integer
+                        description: 'Usuarios en la lista negra'
+                      top_5_domains:
+                        type: array
+                        description: 'Top 5 de dominios más consultados'
+                        items:
+                          type: object
+                          properties:
+                            domain:
+                              type: string
+                              description: 'Dominio'
+                            times_consulted:
+                              type: integer
+                              description: 'Veces que se ha consultado el dominio'
 
   /keys:
     get:
@@ -977,12 +977,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -1026,31 +1026,31 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
-                data:
-                  type: object
-                  description: 'Clave añadida'
-                  properties:
-                    key:
-                      type: string
-                      description: 'Clave de acceso'
-                    created_at:
-                      type: string
-                      description: 'Fecha de creación de la clave, en formato RFC 3339'
-                    expires_at:
-                      type: integer
-                      description: 'Fecha de expiración de la clave, en formato RFC 3339'
-                    owner:
-                      type: string
-                      description: 'Nombre del usuario dueño de la clave'
-                    created_by:
-                      type: string
-                      description: 'Nombre del usuario que ha creado la clave'
-                    notes:
-                      type: string
-                      description: 'Notas sobre la clave'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Clave añadida'
+                    properties:
+                      key:
+                        type: string
+                        description: 'Clave de acceso'
+                      created_at:
+                        type: string
+                        description: 'Fecha de creación de la clave, en formato RFC 3339'
+                      expires_at:
+                        type: integer
+                        description: 'Fecha de expiración de la clave, en formato RFC 3339'
+                      owner:
+                        type: string
+                        description: 'Nombre del usuario dueño de la clave'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha creado la clave'
+                      notes:
+                        type: string
+                        description: 'Notas sobre la clave'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -1118,40 +1118,40 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
-                data:
-                  type: object
-                  description: 'Dominio modificado'
-                  properties:
-                    expires_at:
-                      type: string
-                      description: 'Fecha de expiración de la clave, en formato RFC 3339. Máximo 5 año, solo si se ha modificado'
-                    last_used_at:
-                      type: integer
-                      description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339, solo si se ha modificado'
-                    owner:
-                      type: string
-                      description: 'Nombre del usuario dueño de la clave, solo si se ha modificado'
-                    uses:
-                      type: integer
-                      description: 'Veces que se ha usado la clave, solo si se ha modificado'
-                    ips:
-                      type: array
-                      description: 'IPs desde las que se ha usado la clave, solo si se ha modificado'
-                      items:
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
+                  data:
+                    type: object
+                    description: 'Dominio modificado'
+                    properties:
+                      expires_at:
                         type: string
-                        description: 'IP'
-                    user_agent:
-                      type: string
-                      description: 'User-Agent desde el que se ha usado la clave por última vez, solo si se ha modificado'
-                    created_by:
-                      type: string
-                      description: 'Nombre del usuario que ha creado la clave, solo si se ha modificado'
-                    notes:
-                      type: integer
-                      description: 'Notas sobre la clave, solo si se ha modificado'
+                        description: 'Fecha de expiración de la clave, en formato RFC 3339. Máximo 5 año, solo si se ha modificado'
+                      last_used_at:
+                        type: integer
+                        description: 'Fecha de la última vez que se ha usado la clave, en formato RFC 3339, solo si se ha modificado'
+                      owner:
+                        type: string
+                        description: 'Nombre del usuario dueño de la clave, solo si se ha modificado'
+                      uses:
+                        type: integer
+                        description: 'Veces que se ha usado la clave, solo si se ha modificado'
+                      ips:
+                        type: array
+                        description: 'IPs desde las que se ha usado la clave, solo si se ha modificado'
+                        items:
+                          type: string
+                          description: 'IP'
+                      user_agent:
+                        type: string
+                        description: 'User-Agent desde el que se ha usado la clave por última vez, solo si se ha modificado'
+                      created_by:
+                        type: string
+                        description: 'Nombre del usuario que ha creado la clave, solo si se ha modificado'
+                      notes:
+                        type: integer
+                        description: 'Notas sobre la clave, solo si se ha modificado'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
