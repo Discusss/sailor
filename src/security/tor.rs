@@ -53,6 +53,10 @@ pub async fn get(db: &DatabaseConnection) {
         return;
     }
 
+    if checks.len() > 1000 {
+        warn!("{} new TOR nodes will be added to the blacklist, this may take a while", checks.len());
+    }
+
     let now = Utc::now().naive_utc();
     let size = checks.len();
     let mut errors = 0;
@@ -81,7 +85,7 @@ pub fn start(db: &DatabaseConnection) {
 
     static mut DATABASE: Option<DatabaseConnection> = None;
     unsafe {
-        DATABASE = Some(db.clone());
+        DATABASE = Some(db.clone()); // WAR CRIMES HAHAHSHHASHDHADHSAHDHADH AHDS HAHD AD HAHD HAHD ADASHD JASD ASHJD ASHD AJSD HASJD A
     }
 
     let runner = every(1).day().at(10, 00, 00)
