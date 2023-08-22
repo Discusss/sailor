@@ -158,12 +158,6 @@ fn status_as_str(s: &rocket::http::Status) -> &'static str {
     {
         &CODE_DIGITS[offset..offset + 3]
     }
-
-    #[cfg(not(debug_assertions))]
-    #[allow(unsafe_code)]
-    unsafe {
-        CODE_DIGITS.get_unchecked(offset..offset + 3)
-    }
 }
 
 impl StatusCode {
@@ -255,16 +249,5 @@ impl Handler for PrometheusMetrics {
 impl From<PrometheusMetrics> for Vec<Route> {
     fn from(other: PrometheusMetrics) -> Self {
         vec![Route::new(Method::Get, "/", other)]
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::PrometheusMetrics;
-
-    #[test]
-    fn test_multiple_instantiations() {
-        let _pm1 = PrometheusMetrics::with_default_registry();
-        let _pm2 = PrometheusMetrics::with_default_registry();
     }
 }

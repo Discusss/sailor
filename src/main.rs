@@ -70,6 +70,7 @@ async fn main() {
         .to_cors();
 
     let prometheus = utils::prometheus::configure();
+    //let security = security::security::Security::new(&pool);
 
     if let Err(e) = rocket::build()
         .manage(pool)
@@ -80,6 +81,7 @@ async fn main() {
         .attach(Shield::default())
         .attach(cors.unwrap())
         .attach(prometheus)
+        //.attach(security)
         .launch()
         .await
     {

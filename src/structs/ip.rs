@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use rocket::{Request};
 use rocket::request::{FromRequest, Outcome};
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
@@ -7,7 +8,8 @@ use crate::entities::prelude::Blacklist;
 pub struct RemoteAddress {
     pub ip: String,
     pub user_agent: Option<String>,
-    pub is_blacklisted: bool
+    pub is_blacklisted: bool,
+    pub ban_data: Option<blacklist::Model>,
 }
 
 #[rocket::async_trait]
@@ -19,30 +21,53 @@ impl<'r> FromRequest<'r> for RemoteAddress {
         let db = request.rocket().state::<DatabaseConnection>().unwrap();
         let user_agent = get_user_agent(request);
 
-        match Blacklist::find()
+        let ban = match Blacklist::find()
             .filter(blacklist::Column::Ip.contains(ip.clone()))
             .one(db)
             .await
         {
             Ok(ban) => match ban {
-                Some(_) => (),
+                Some(ban) => ban,
                 None => return Outcome::Success(RemoteAddress {
                     ip,
                     user_agent,
-                    is_blacklisted: false
+                    is_blacklisted: false,
+                    ban_data: None
                 }),
             }
             Err(_) => return Outcome::Success(RemoteAddress {
                 ip,
                 user_agent,
-                is_blacklisted: false
+                is_blacklisted: false,
+                ban_data: None
             }),
         };
+
+        let expires = match ban.expires_at {
+            Some(date) => date,
+            None => return Outcome::Success(RemoteAddress {
+                ip,
+                user_agent,
+                is_blacklisted: true,
+                ban_data: Some(ban)
+            })
+        };
+
+        let now = chrono::Utc::now().naive_utc();
+        if now > expires {
+            return Outcome::Success(RemoteAddress {
+                ip,
+                user_agent,
+                is_blacklisted: false,
+                ban_data: None
+            });
+        }
 
         Outcome::Success(RemoteAddress {
             ip,
             user_agent,
-            is_blacklisted: true
+            is_blacklisted: true,
+            ban_data: Some(ban)
         })
     }
 }

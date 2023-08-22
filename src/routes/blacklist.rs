@@ -75,26 +75,13 @@ pub async fn get_blacklist(db: &State<DatabaseConnection>, auth: Auth, ip: Strin
 }
 
 #[get("/blacklist/check")]
-pub async fn check_blacklist(db: &State<DatabaseConnection>, remote: RemoteAddress)-> Result<Json<DataResponse>, Status> {
-    let db = db as &DatabaseConnection;
+pub async fn check_blacklist(remote: RemoteAddress)-> Result<Json<DataResponse>, Status> {
 
     if !remote.is_blacklisted {
         return Err(Status::NotFound);
     }
 
-    let ip = remote.ip;
-
-    let ban = match Blacklist::find()
-        .filter(blacklist::Column::Ip.contains(ip))
-        .one(db)
-        .await
-    {
-        Ok(ban) => match ban {
-            Some(ban) => ban,
-            None => return Err(Status::NotFound),
-        },
-        Err(_) => return Err(Status::InternalServerError),
-    };
+    let ban = remote.ban_data.unwrap();
 
     let response_json = DataResponse {
         status: "200".to_string(),

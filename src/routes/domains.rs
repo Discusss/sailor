@@ -18,7 +18,7 @@ use crate::utils::response::DataResponse;
 pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String, auth: Auth) -> Result<status::Custom<Json<DataResponse>>, Status> {
     let db = db as &DatabaseConnection;
 
-    if !parser::is_valid_domain(&domain) {
+    if !parser::is_valid_domain(&domain, db, &remote.ip).await {
         return Err(Status::BadRequest);
     }
 
