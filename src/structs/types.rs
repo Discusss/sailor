@@ -35,17 +35,4 @@ impl LinkType {
             _ => LinkType::Other,
         }
     }
-
-    pub fn to_code(&self) -> i32 {
-        match self {
-            LinkType::Phishing => 0,
-            LinkType::Malware => 1,
-            LinkType::SessionHijacking => 2,
-            LinkType::XSS => 3,
-            LinkType::ClickJacking => 4,
-            LinkType::SocialEngineering => 5,
-            LinkType::IpGrabber => 6,
-            LinkType::Other => 7,
-        }
-    }
 }

@@ -2,7 +2,6 @@ use std::process::exit;
 use rocket::Request;
 use rocket::request::{FromRequest, Outcome};
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
-use serde::{Deserialize, Serialize};
 use validators::prelude::*;
 use crate::entities::keys;
 use crate::entities::prelude::Keys;
