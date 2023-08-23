@@ -27,5 +27,10 @@ pub fn api() -> Vec<rocket::Route> {
 }
 
 pub fn catchers() -> Vec<rocket::Catcher> {
-    return catchers![errors::not_found, errors::internal_error];
+    return catchers![
+        errors::not_found,
+        errors::internal_error,
+        errors::forbidden,
+        errors::unauthorized,
+    ];
 }
