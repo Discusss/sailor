@@ -1,0 +1,25 @@
+{
+  "name": "phishing",
+  "version": "0.0.1",
+  "description": "Official NPM for the Discusss phishing API",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Discusss/phishing.git"
+  },
+  "keywords": [
+    "discord",
+    "phishing",
+    "database",
+    "npm",
+    "hacktoberfest"
+  ],
+  "author": "Markox36, ThePhoDit, holasoyender",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Discusss/phishing/issues"
+  },
+  "homepage": "https://github.com/Discusss/phishing#readme"
+}
