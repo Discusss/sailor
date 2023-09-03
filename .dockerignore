@@ -3,4 +3,5 @@
 !migration
 !src
 !Dockerfile
+!assets/favicon.ico
 !.cargo

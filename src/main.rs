@@ -1,4 +1,7 @@
+#![feature(async_closure)]
+
 use std::process::exit;
+use std::thread;
 use dotenvy::dotenv;
 use rocket::http::Method;
 use rocket::shield::Shield;
@@ -20,6 +23,7 @@ mod routes;
 mod utils;
 mod entities;
 mod structs;
+pub(crate) mod security;
 
 /*
 
@@ -48,6 +52,13 @@ async fn main() {
         },
     };
 
+    let db = pool.clone();
+    thread::spawn(async move || {
+        info!("Starting TOR IP download cron job");
+        security::tor::get(&db).await;
+        security::tor::start(&db);
+    }).join().unwrap().await;
+
     Migrator::up(&pool, None).await.unwrap();
 
     let cors = rocket_cors::CorsOptions {
@@ -59,6 +70,7 @@ async fn main() {
         .to_cors();
 
     let prometheus = utils::prometheus::configure();
+    //let security = security::security::Security::new(&pool);
 
     if let Err(e) = rocket::build()
         .manage(pool)
@@ -69,6 +81,7 @@ async fn main() {
         .attach(Shield::default())
         .attach(cors.unwrap())
         .attach(prometheus)
+        //.attach(security)
         .launch()
         .await
     {

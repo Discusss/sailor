@@ -4,11 +4,16 @@ use rocket::State;
 use sea_orm::{DatabaseConnection, EntityTrait, PaginatorTrait, QueryOrder, QuerySelect};
 use crate::entities::domains;
 use crate::entities::prelude::{Blacklist, Domains};
+use crate::structs::ip::RemoteAddress;
 use crate::utils::response::DataResponse;
 
 #[get("/")]
-pub async fn get_stats(db: &State<DatabaseConnection>) -> Result<Json<DataResponse>, Status> {
+pub async fn get_stats(db: &State<DatabaseConnection>, remote: RemoteAddress) -> Result<Json<DataResponse>, Status> {
     let db = db as &DatabaseConnection;
+
+    if remote.is_blacklisted {
+        return Err(Status::Forbidden);
+    }
 
     let total_domains = match Domains::find()
         .count(db)

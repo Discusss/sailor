@@ -6,7 +6,6 @@ use rocket::response::status;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, ModelTrait, QueryFilter};
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
-use validators::prelude::*;
 use crate::entities::{prelude::*, *};
 use crate::structs::auth::{Auth, obfuscate_key};
 use crate::structs::ip::RemoteAddress;
@@ -18,12 +17,12 @@ use crate::utils::response::DataResponse;
 pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String, auth: Auth) -> Result<status::Custom<Json<DataResponse>>, Status> {
     let db = db as &DatabaseConnection;
 
-    if !parser::is_valid_domain(&domain) {
-        return Err(Status::BadRequest);
-    }
-
     if remote.is_blacklisted {
         return Err(Status::Forbidden);
+    }
+
+    if !parser::is_valid_domain(&domain, db, &remote.ip).await {
+        return Err(Status::BadRequest);
     }
 
     let domain_info: domains::Model = match Domains::find()
@@ -119,7 +118,7 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         return Err(Status::Forbidden);
     }
 
-    if !Domain::parse_string(&body.domain).is_ok() {
+    if !parser::is_valid_domain(&body.domain, db, &remote.ip).await {
         return Err(Status::BadRequest);
     }
 
@@ -338,10 +337,6 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
     //todo: detect suspicious activity and blacklist the ip or ban the api key
     Ok(Json(response_json))
 }
-
-#[derive(Validator)]
-#[validator(domain(ipv4(NotAllow), local(NotAllow), at_least_two_labels(Allow), port(NotAllow)))]
-pub struct Domain(pub String);
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateDomainBody {
