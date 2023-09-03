@@ -9,6 +9,7 @@ import helpers.url_analyzer as url_analyzer
 import requests
 from discord import Bot, Color
 from flask import Flask, jsonify, request
+import hashlib
 
 
 def _get_last_element_or_string(data):
@@ -40,10 +41,26 @@ class WebhookReceiver:
 
     def receive_webhook(self):
         data = request.json
+        signature = request.headers.get("X-LACABRA-Signature")
+        for a in request.headers.keys():
+            print(a)
 
+        if not signature:
+            return jsonify({"message": "Provide a valid signature."}), 401
+
+        md5_hash = hashlib.md5()
+        md5_hash.update((str(data) + os.getenv("WEBHOOK_HASH_KEY")).encode("utf-8"))
+        print(signature)
+        print(md5_hash.hexdigest())
+        if md5_hash.hexdigest() != signature:
+            return jsonify({"message": "Provide a valid signature."}), 401
+
+        # TODO: Handle missing values
+        domain_id: int = data["id"]
         link: str = data["link"]
         category: str = data["category"]
         priority: int = data["priority"]
+        reason: str = data["reason"]
         note: str = data["note"]
 
         if link is None:
@@ -75,12 +92,12 @@ class WebhookReceiver:
                         "fields": [
                             {
                                 "name": "Categoría",
-                                "value": category,
+                                "value": category if category is not None else "Sin categoría.",
                                 "inline": True
                             },
                             {
                                 "name": "Priority",
-                                "value": priority,
+                                "value": priority if priority is not None else "Sin prioridad.",
                                 "inline": True
                             },
                             {
@@ -116,10 +133,17 @@ class WebhookReceiver:
                                 "inline": True
                             },
                             {
+                                "name": "Razón",
+                                "value": reason
+                            },
+                            {
                                 "name": "Notas del Usuario",
-                                "value": note if note != "" else "Sin nota."
+                                "value": note if note is not None else "Sin nota."
                             }
-                        ]
+                        ],
+                        "footer": {
+                            "text": domain_id
+                        }
                     }
                 ],
                 "components": [
