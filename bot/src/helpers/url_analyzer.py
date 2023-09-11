@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives import serialization
 
 def get_netloc(url):
     parsed = urlparse(url)
-    if parsed.netloc == '' and parsed.path != '':
+    if parsed.netloc == "" and parsed.path != "":
         # Handle cases where netloc is empty but path is present (e.g., google.com)
         return parsed.path
     else:
@@ -38,7 +38,12 @@ def check_ssl_certificate(domain):
             x509_cert = x509.load_der_x509_certificate(
                 cert_pem.public_bytes(serialization.Encoding.DER), default_backend()
             )
-            return True, x509_cert.issuer.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)[0].value
+            return (
+                True,
+                x509_cert.issuer.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)[
+                    0
+                ].value,
+            )
     except SSL.Error:
         return False, ""
     except socket.gaierror:
@@ -47,21 +52,31 @@ def check_ssl_certificate(domain):
 
 def get_domain_registration_info(domain):
     try:
-        domain_info = whois.whois(domain)
+        domain_info = whois.whois("https://" + domain)
 
         return {
             "is_registered": domain_info.status is not None,
             "registrar": domain_info.registrar,
             "creation_date": domain_info.creation_date,
             "updated_date": domain_info.updated_date,
-            "expiration_date": domain_info.expiration_date
+            "expiration_date": domain_info.expiration_date,
         }
     except whois.exceptions.FailedParsingWhoisOutput:
-        return {
-            "is_registered": False,
-            "registrar": None,
-            "creation_date": None,
-            "updated_date": None,
-            "expiration_date": None
-        }
+        try:
+            domain_info = whois.whois("http://" + domain)
 
+            return {
+                "is_registered": domain_info.status is not None,
+                "registrar": domain_info.registrar,
+                "creation_date": domain_info.creation_date,
+                "updated_date": domain_info.updated_date,
+                "expiration_date": domain_info.expiration_date,
+            }
+        except whois.exceptions.FailedParsingWhoisOutput:
+            return {
+                "is_registered": False,
+                "registrar": None,
+                "creation_date": None,
+                "updated_date": None,
+                "expiration_date": None,
+            }

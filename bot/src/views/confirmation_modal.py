@@ -10,16 +10,16 @@ from constants import MALICIOUS_CATEGORIES
 
 class ConfirmationModal(Modal):
     def __init__(
-            self,
-            domain_id: int,
-            link: str,
-            category: str,
-            priority: int,
-            reason: str,
-            note: str,
-            original_interaction: Interaction,
-            *args,
-            **kwargs
+        self,
+        domain_id: int,
+        link: str,
+        category: str,
+        priority: int,
+        reason: str,
+        note: str,
+        original_interaction: Interaction,
+        *args,
+        **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -32,10 +32,38 @@ class ConfirmationModal(Modal):
         if priority == "Sin prioridad.":
             priority = ""
 
-        self.add_item(InputText(label="Categoría", style=InputTextStyle.short, value=category))
-        self.add_item(InputText(label="Prioridad (0-10)", style=InputTextStyle.short, value=str(priority)))
-        self.add_item(InputText(label="Nota del Usuario", style=InputTextStyle.long, value=note, required=False))
-        self.add_item(InputText(label="Nota del Revisor", style=InputTextStyle.long, value="", required=False))
+        self.add_item(
+            InputText(
+                label="Categoría",
+                style=InputTextStyle.short,
+                value=category,
+                required=True
+            )
+        )
+        self.add_item(
+            InputText(
+                label="Prioridad (0-10)",
+                style=InputTextStyle.short,
+                value=str(priority),
+                required=True
+            )
+        )
+        self.add_item(
+            InputText(
+                label="Nota del Usuario",
+                style=InputTextStyle.long,
+                value=note,
+                required=False,
+            )
+        )
+        self.add_item(
+            InputText(
+                label="Nota del Revisor",
+                style=InputTextStyle.long,
+                value="",
+                required=False,
+            )
+        )
 
         self._id = domain_id
         self._reason = reason
@@ -52,8 +80,10 @@ class ConfirmationModal(Modal):
         if category not in MALICIOUS_CATEGORIES:
             category = self._original_category
 
-        if priority is not int:
-            await interaction.response.send_message("Proporciona una prioridad válida.", ephemeral=True)
+        if not priority.isnumeric():
+            await interaction.response.send_message(
+                "Proporciona una prioridad válida.", ephemeral=True
+            )
             return
         else:
             priority = int(priority)
@@ -61,24 +91,55 @@ class ConfirmationModal(Modal):
         if 0 > priority > 10:
             priority = self._original_priority
 
-        requests.patch(
-            url=os.getenv("API_BASE_URL") + "/domains",
-            params=json.dumps({
-                "id": self._id
-            }),
-            data=json.dumps({
-                "category": MALICIOUS_CATEGORIES[category] if category is not None else None,
-                "priority": priority,
-                "public_notes": user_note,
-                "notes": reviewer_note,
-                "approved_by": interaction.user.name
-            })
+        response = requests.patch(
+            url=os.getenv("API_BASE_URL") + "/domain",
+            params=json.dumps({"id": self._id}),
+            headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")},
+            data=json.dumps(
+                {
+                    "category": MALICIOUS_CATEGORIES.get(category, 7),  # Other as default for invalid values.,
+                    "priority": priority,
+                    "public_notes": user_note,
+                    "notes": reviewer_note,
+                    "approved_by": interaction.user.name,
+                }
+            ),
         )
 
-        embed = Embed(
-            color=Color.green(),
-            title="Gracias por la valoración",
-            description="Enlace aprobado."
-        )
+        if response.status_code == 200:
+            embed = Embed(
+                color=Color.green(),
+                title="Gracias por la valoración",
+                description="Enlace aprobado.",
+            )
+        elif response.status_code == 400:
+            embed = Embed(
+                color=Color.yellow(),
+                title="ERROR",
+                description="La petición no es válida (400).",
+            )
+        elif response.status_code == 401:
+            embed = Embed(
+                color=Color.yellow(),
+                title="ERROR",
+                description="La clave de autorización no es válida.",
+            )
+        elif response.status_code == 403:
+            embed = Embed(
+                color=Color.yellow(),
+                title="ERROR",
+                description="El bot está en la blacklist.",
+            )
+        elif response.status_code == 404:
+            embed = Embed(
+                color=Color.yellow(), title="ERROR", description="Enlace no encontrado."
+            )
+        else:
+            embed = Embed(
+                color=Color.yellow(),
+                title="ERROR",
+                description="Ha ocurrido un error desconocido.",
+            )
+
         await interaction.response.send_message(embed=embed, ephemeral=True)
         await self._original_interaction.delete_original_response()

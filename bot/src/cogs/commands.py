@@ -16,16 +16,20 @@ class Commands(commands.Cog):
 
     @slash_command(
         description="Reporta un enlace sospechoso de ser phishing y lo revisaremos.",
-        guild_only=True
+        guild_only=True,
     )
     async def reportar(
-            self,
-            ctx: ApplicationContext,
-            link: Option(str, name="enlace", required=True),
-            reason: Option(str, name="razón", required=True),
-            category: Option(str, name="categoría", choices=MALICIOUS_CATEGORIES, required=False),
-            priority: Option(int, name="prioridad",  min_value=0, max_value=10, required=False),
-            notes: Option(str, name="nota", required=False)
+        self,
+        ctx: ApplicationContext,
+        link: Option(str, name="enlace", required=True),
+        reason: Option(str, name="razón", required=True),
+        category: Option(
+            str, name="categoría", choices=MALICIOUS_CATEGORIES, required=False
+        ),
+        priority: Option(
+            int, name="prioridad", min_value=0, max_value=10, required=False
+        ),
+        notes: Option(str, name="nota", required=False),
     ):
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
@@ -33,7 +37,7 @@ class Commands(commands.Cog):
             embed = Embed(
                 title="Reporte de Enlaces",
                 color=Color.red(),
-                description="No se ha detectado ningún enlace."
+                description="No se ha detectado ningún enlace.",
             )
             await ctx.respond(embed=embed)
             return
@@ -42,35 +46,38 @@ class Commands(commands.Cog):
 
         response = requests.post(
             url=os.getenv("API_BASE_URL") + "/domain",
-            data=json.dumps({
-                "domain": netloc,
-                "category": MALICIOUS_CATEGORIES[category] if category is not None else None,
-                "priority": priority,
-                "submitted_by": ctx.user.name,
-                "reason": reason,
-                "notes": notes
-            })
+            data=json.dumps(
+                {
+                    "domain": netloc,
+                    "category": MALICIOUS_CATEGORIES[category]
+                    if category is not None
+                    else None,
+                    "priority": priority,
+                    "submitted_by": ctx.user.name,
+                    "reason": reason,
+                    "notes": notes,
+                }
+            ),
         )
 
         if response.status_code == 200:
             embed = Embed(
                 title="Reporte de Enlaces",
                 color=Color.green(),
-                description="Enlace mandado a revisar, gracias por la ayuda."
+                description="Enlace mandado a revisar, gracias por la ayuda.",
             )
         elif response.status_code == 409:
-
             embed = Embed(
                 title="Reporte de Enlaces",
                 color=Color.red(),
-                description="Enlace ya registrado en la base de datos."
+                description="Enlace ya registrado en la base de datos.",
             )
         else:
             print(response.status_code, response.reason)
             embed = Embed(
                 title="Reporte de Enlaces",
                 color=Color.red(),
-                description="Ha ocurrido un error inesperado."
+                description="Ha ocurrido un error inesperado.",
             )
 
         await ctx.respond(embed=embed)
