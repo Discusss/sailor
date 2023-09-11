@@ -16,20 +16,20 @@ class Commands(commands.Cog):
 
     @slash_command(
         description="Reporta un enlace sospechoso de ser phishing y lo revisaremos.",
-        guild_only=True,
+        guild_only=True
     )
     async def reportar(
-        self,
-        ctx: ApplicationContext,
-        link: Option(str, name="enlace", required=True),
-        reason: Option(str, name="razón", required=True),
-        category: Option(
-            str, name="categoría", choices=MALICIOUS_CATEGORIES, required=False
-        ),
-        priority: Option(
-            int, name="prioridad", min_value=0, max_value=10, required=False
-        ),
-        notes: Option(str, name="nota", required=False),
+            self,
+            ctx: ApplicationContext,
+            link: Option(str, name="enlace", required=True),
+            reason: Option(str, name="razón", required=True),
+            category: Option(
+                str, name="categoría", choices=MALICIOUS_CATEGORIES, required=False
+            ),
+            priority: Option(
+                int, name="prioridad", min_value=0, max_value=10, required=False
+            ),
+            notes: Option(str, name="nota", required=False),
     ):
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
@@ -78,6 +78,52 @@ class Commands(commands.Cog):
                 title="Reporte de Enlaces",
                 color=Color.red(),
                 description="Ha ocurrido un error inesperado.",
+            )
+
+        await ctx.respond(embed=embed)
+
+    @slash_command(
+        description="Obtén información de un enlace.",
+        guild_only=True
+    )
+    async def comprobar(
+            self,
+            ctx: ApplicationContext,
+            link: Option(str, name="enlace", required=True)
+    ):
+        urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
+
+        if urls is None:
+            embed = Embed(
+                title="Comprobación de enlaces",
+                color=Color.red(),
+                description="No se ha detectado ningún enlace.",
+            )
+            await ctx.respond(embed=embed)
+            return
+
+        netloc = get_netloc(urls[0])
+
+        response = requests.get(
+            url=os.getenv("API_BASE_URL") + "/domain",
+            params=json.dumps({"domain": netloc})
+        )
+
+        body = response.json()
+        if response.status_code == 200:
+            embed = Embed(
+                title=f"Información de {netloc}",
+                color=Color.greyple()
+            )
+            embed\
+                .add_field(name="Categoría", value=body["category"], inline=True)\
+                .add_field(name="Prioridad", value=body["priority"], inline=True)\
+                .add_field(name="Notas", value=body["notes"])
+        else:
+            embed = Embed(
+                title="No encontrado",
+                color=Color.red(),
+                description="No se ha encontrado el enlace en la base de datos.",
             )
 
         await ctx.respond(embed=embed)
