@@ -38,6 +38,7 @@ async fn main() {
         Ok(db) => {
             assert!(db.ping().await.is_ok());
             info!("Database connection established");
+            Migrator::up(&db, None).await.unwrap();
             validate_master_key(&db).await;
             db
         },
@@ -53,8 +54,6 @@ async fn main() {
         security::tor::get(&db).await;
         security::tor::start(&db);
     }).join().unwrap().await;
-
-    Migrator::up(&pool, None).await.unwrap();
 
     let cors = rocket_cors::CorsOptions {
         allowed_methods: vec![Method::Get, Method::Post, Method::Delete].into_iter().map(From::from).collect(),

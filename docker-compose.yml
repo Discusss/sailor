@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: phishing-api
+    image: phishing:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://phishing:phishing@phishing-postgres:5432/phishing
+      PROMETHEUS_KEY: ${PROMETHEUS_KEY}
+      MASTER_KEY: ${MASTER_KEY}
+      WEBHOOK_URL: http://webhook:5001
+      WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  webhook:
+    container_name: webhook
+    image: webhook-server:latest
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      REVIEWING_CHANNEL_ID: ${REVIEWING_CHANNEL_ID}
+      WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
+
+  bot:
+    container_name: phishing-bot
+    image: bot:latest
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      API_BASE_URL: http://phishing-api:8000
+      API_AUTH_TOKEN: ${MASTER_KEY}
+      WEBHOOK_URL: http://webhook:5001
+      WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
+      PYTHON_PATH: /bot
+
+  postgres:
+    container_name: phishing-postgres
+    image: postgres:15.2-alpine
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U phishing -h localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_USER: phishing
+      POSTGRES_PASSWORD: phishing
+      PGPASSWORD: phishing
+      PGPORT: 5432
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: phishing
+      PGDATABASE: phishing
+    volumes:
+      - ./postgres:/var/lib/postgresql/data

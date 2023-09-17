@@ -4,6 +4,10 @@ RUN USER=root cargo new --bin phishing
 WORKDIR ./phishing
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./migration ./migration
+COPY ./io ./io
+
+RUN rustup override set nightly
+
 RUN cargo build --release \
     && rm src/*.rs target/release/deps/phishing*
 
