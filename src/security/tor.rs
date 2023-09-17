@@ -6,6 +6,7 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 use crate::entities::blacklist;
 use crate::entities::prelude::Blacklist;
+use crate::security::md5;
 
 fn get_nodes() -> Vec<String> {
     return match ureq::get("https://check.torproject.org/torbulkexitlist")
@@ -20,7 +21,9 @@ fn get_nodes() -> Vec<String> {
                 if line.starts_with("#") {
                     continue;
                 }
-                ips.push(line.to_string());
+
+                let ip = format!("{:?}", md5::compute(line.to_string()));
+                ips.push(ip);
             }
             info!("Downloaded {} TOR IPs", ips.len());
             ips
@@ -33,7 +36,7 @@ fn get_nodes() -> Vec<String> {
 }
 
 pub async fn get(db: &DatabaseConnection) {
-    let nodes = get_nodes();
+    let nodes = get_nodes(); // hashed ips
 
     let known_ips: Vec<String> = match Blacklist::find()
         .filter(blacklist::Column::Reason.contains("TOR Node"))
@@ -61,8 +64,9 @@ pub async fn get(db: &DatabaseConnection) {
     let size = checks.len();
     let mut errors = 0;
     for node in checks {
+
         let save = blacklist::ActiveModel {
-            ip: Set(node.clone()),
+            ip: Set(node.to_string()),
             reason: Set("TOR Node".to_string()),
             expires_at: Set(None),
             created_at: Set(now),

@@ -3,6 +3,7 @@ use rocket::request::{FromRequest, Outcome};
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 use crate::entities::blacklist;
 use crate::entities::prelude::Blacklist;
+use crate::security::md5;
 
 pub struct RemoteAddress {
     pub ip: String,
@@ -76,7 +77,7 @@ pub fn get_ip(request: &Request) -> String {
     let headers = request.headers();
     let forwarded_for = headers.get_one("X-Forwarded-For");
 
-    return match forwarded_for {
+    return format!("{:?}", md5::compute(match forwarded_for {
         Some(forwarded_for) => {
             let new_ip = match forwarded_for.parse::<std::net::IpAddr>() {
                 Ok(new_ip) => new_ip.to_string(),
@@ -85,7 +86,7 @@ pub fn get_ip(request: &Request) -> String {
             new_ip
         }
         None => ip
-    };
+    }));
 }
 
 fn get_user_agent(request: &Request) -> Option<String> {
