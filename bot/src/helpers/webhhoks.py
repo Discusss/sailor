@@ -11,6 +11,8 @@ from discord import Bot, Color
 from flask import Flask, jsonify, request
 import hashlib
 
+from constants import MALICIOUS_CATEGORIES
+
 
 def _get_last_element_or_string(data):
     if isinstance(data, list):
@@ -42,28 +44,24 @@ class WebhookReceiver:
         self._app.run(debug=False, port=self._port)
 
     def receive_webhook(self):
+        raw_data = request.data.decode('utf-8')
         data = request.json
         signature = request.headers.get("X-LACABRA-Signature")
-        for a in request.headers.keys():
-            print(a)
 
         if not signature:
             return jsonify({"message": "Provide a valid signature."}), 401
 
         md5_hash = hashlib.md5()
-        md5_hash.update((str(data) + os.getenv("WEBHOOK_HASH_KEY")).encode("utf-8"))
-        print(signature)
-        print(md5_hash.hexdigest())
+        md5_hash.update((str(raw_data) + os.getenv("WEBHOOK_HASH_KEY")).encode("utf-8"))
         if md5_hash.hexdigest() != signature:
             return jsonify({"message": "Provide a valid signature."}), 401
 
-        # TODO: Handle missing values
         domain_id: int = data.get("id")
-        link: str = data.get("link")
+        link: str = data.get("domain")
         category: str = data.get("category")
         priority: int = data.get("priority")
-        reason: str = data.get("reason")
-        note: str = data.get("note")
+        reason: str = data.get("submitted_reason")
+        note: str = data.get("public_notes")
 
         if link is None:
             return jsonify({"message": "URL de phishing no proporcionada."}), 400
@@ -78,6 +76,13 @@ class WebhookReceiver:
 
         ssl_cert = url_analyzer.check_ssl_certificate(final_url)
         registrar = url_analyzer.get_domain_registration_info(final_url)
+
+        select_menu_options = []
+        for malicious_category in MALICIOUS_CATEGORIES:
+            select_menu_options.append({
+                "label": malicious_category,
+                "value": malicious_category
+            })
 
         requests.post(
             url=f"https://discord.com/api/v10/channels/{self._review_channel_id}/messages",
@@ -160,18 +165,23 @@ class WebhookReceiver:
                             "type": 1,
                             "components": [
                                 {
-                                    "type": 2,
+                                    "type": 3,
                                     "label": "Aprobar",
-                                    "style": 3,  # Success
+                                    "placeholder": "Seleccionar categoría",
                                     "custom_id": "approved-link",
-                                },
-                                {
+                                    "options": select_menu_options
+                                }
+
+                            ]
+                        },
+                        {
+                            "type": 1,
+                            "components": [{
                                     "type": 2,
                                     "label": "Rechazar",
                                     "style": 4,  # Danger
                                     "custom_id": "rejected-link",
-                                },
-                            ],
+                                }]
                         }
                     ],
                 }

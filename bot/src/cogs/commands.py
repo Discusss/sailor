@@ -73,7 +73,6 @@ class Commands(commands.Cog):
                 description="Enlace ya registrado en la base de datos.",
             )
         else:
-            print(response.status_code, response.reason)
             embed = Embed(
                 title="Reporte de Enlaces",
                 color=Color.red(),
@@ -106,19 +105,19 @@ class Commands(commands.Cog):
 
         response = requests.get(
             url=os.getenv("API_BASE_URL") + "/domain",
-            params=json.dumps({"domain": netloc})
+            params={"domain": netloc}
         )
 
-        body = response.json()
+        body = dict(response.json())["data"]
         if response.status_code == 200:
             embed = Embed(
                 title=f"Información de {netloc}",
                 color=Color.greyple()
             )
             embed\
-                .add_field(name="Categoría", value=body["category"], inline=True)\
-                .add_field(name="Prioridad", value=body["priority"], inline=True)\
-                .add_field(name="Notas", value=body["notes"])
+                .add_field(name="Categoría", value=body.get("category"), inline=True)\
+                .add_field(name="Prioridad", value=body.get("priority"), inline=True)\
+                .add_field(name="Notas", value=body.get("notes"))
         else:
             embed = Embed(
                 title="No encontrado",

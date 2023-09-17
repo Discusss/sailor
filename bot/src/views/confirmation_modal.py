@@ -26,20 +26,20 @@ class ConfirmationModal(Modal):
         if note == "Sin nota.":
             note = ""
 
-        if category == "Sin categoría.":
-            category = ""
+        # if category == "Sin categoría.":
+        #     category = ""
 
         if priority == "Sin prioridad.":
             priority = ""
 
-        self.add_item(
-            InputText(
-                label="Categoría",
-                style=InputTextStyle.short,
-                value=category,
-                required=True
-            )
-        )
+        # self.add_item(
+        #     InputText(
+        #         label="Categoría",
+        #         style=InputTextStyle.short,
+        #         value=category,
+        #         required=True
+        #     )
+        # )
         self.add_item(
             InputText(
                 label="Prioridad (0-10)",
@@ -56,29 +56,24 @@ class ConfirmationModal(Modal):
                 required=False,
             )
         )
-        self.add_item(
-            InputText(
-                label="Nota del Revisor",
-                style=InputTextStyle.long,
-                value="",
-                required=False,
-            )
-        )
+        # self.add_item(
+        #     InputText(
+        #         label="Nota del Revisor",
+        #         style=InputTextStyle.long,
+        #         value="",
+        #         required=False,
+        #     )
+        # )
 
         self._id = domain_id
         self._reason = reason
-        self._original_category = category
+        self._category = category
         self._original_priority = priority
         self._original_interaction = original_interaction
 
     async def callback(self, interaction: Interaction):
-        category = self.children[0].value
-        priority = self.children[1].value
-        user_note = self.children[2].value
-        reviewer_note = self.children[3].value
-
-        if category not in MALICIOUS_CATEGORIES:
-            category = self._original_category
+        priority = self.children[0].value
+        user_note = self.children[1].value
 
         if not priority.isnumeric():
             await interaction.response.send_message(
@@ -89,18 +84,20 @@ class ConfirmationModal(Modal):
             priority = int(priority)
 
         if 0 > priority > 10:
-            priority = self._original_priority
+            await interaction.response.send_message(
+                "Proporciona una prioridad válida.", ephemeral=True
+            )
+            return
 
         response = requests.patch(
             url=os.getenv("API_BASE_URL") + "/domain",
-            params=json.dumps({"id": self._id}),
+            params={"id": self._id},
             headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")},
             data=json.dumps(
                 {
-                    "category": MALICIOUS_CATEGORIES.get(category, 7),  # Other as default for invalid values.,
+                    "category": MALICIOUS_CATEGORIES[self._category],
                     "priority": priority,
                     "public_notes": user_note,
-                    "notes": reviewer_note,
                     "approved_by": interaction.user.name,
                 }
             ),

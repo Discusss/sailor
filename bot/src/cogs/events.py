@@ -45,7 +45,7 @@ class Events(commands.Cog):
             if interaction.custom_id == "rejected-link":
                 response = requests.delete(
                     url=os.getenv("BASE_API_URL") + "/domain",
-                    params=json.dumps({"id": domain_id}),
+                    params={"id": domain_id},
 
                     headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")}
                 )
@@ -87,7 +87,7 @@ class Events(commands.Cog):
             elif interaction.custom_id == "approved-link":
                 # Get information of the report based on the embed.
                 link = interaction.message.embeds[0].description
-                category = interaction.message.embeds[0].fields[0].value
+                category = interaction.data.get("values", ["Other"])[0]
                 priority = interaction.message.embeds[0].fields[1].value
                 reason = interaction.message.embeds[0].fields[-2].value
                 user_note = interaction.message.embeds[0].fields[-1].value
