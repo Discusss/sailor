@@ -29,7 +29,8 @@ pub(crate) mod security;
 
     ==== Webhook ====
     POST /webhook (with JSON body) --> Mandar al bot de discord información sobre un nuevo dominio
-
+    HEADER X-LACABRA-Signature MD5(body + secret) --> Para validar que el webhook viene de nosotros (key: "asdf" EN DESARROLLO)
+    BODY: esquema entero
  */
 
 #[rocket::main]

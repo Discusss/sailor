@@ -39,4 +39,4 @@ log = { version = "0.4.19" }
 fern = { version = "0.6.2", features = ["colored"] }
 validators = { version = "0.24.3" }
 tokio_schedule = { version = "0.3.1" }
-ureq = { version = "2.7.1" }
+ureq = { version = "2.7.1", features = ["json", "serde_json"] }

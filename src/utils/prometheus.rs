@@ -154,10 +154,7 @@ fn status_as_str(s: &rocket::http::Status) -> &'static str {
     let offset = (s.code - 100) as usize;
     let offset = offset * 3;
 
-    #[cfg(debug_assertions)]
-    {
-        &CODE_DIGITS[offset..offset + 3]
-    }
+    &CODE_DIGITS[offset..offset + 3]
 }
 
 impl StatusCode {
