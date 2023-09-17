@@ -2,14 +2,13 @@ import socket
 from urllib.parse import urlparse
 
 from OpenSSL import SSL
-from OpenSSL.crypto import load_certificate, FILETYPE_PEM
 from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from cryptography.hazmat.backends import default_backend
 
 import whois
 
-# TODO: Make both functions work when no protocol is present
+
 from cryptography.hazmat.primitives import serialization
 
 

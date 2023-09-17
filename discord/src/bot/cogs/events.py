@@ -8,7 +8,7 @@ import requests
 from discord import Embed
 from discord.ext import commands
 
-from views.confirmation_modal import ConfirmationModal
+from bot.views.confirmation_modal import ConfirmationModal
 
 logger = logging.getLogger("BOT")
 
@@ -66,7 +66,7 @@ class Events(commands.Cog):
                     embed = Embed(
                         color=discord.Color.yellow(),
                         title="ERROR",
-                        description="El bot está en la blacklist.",
+                        description="El discord está en la blacklist.",
                     )
                 elif response.status_code == 404:
                     embed = Embed(

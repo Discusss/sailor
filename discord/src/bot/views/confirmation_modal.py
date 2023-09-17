@@ -26,20 +26,9 @@ class ConfirmationModal(Modal):
         if note == "Sin nota.":
             note = ""
 
-        # if category == "Sin categoría.":
-        #     category = ""
-
         if priority == "Sin prioridad.":
             priority = ""
 
-        # self.add_item(
-        #     InputText(
-        #         label="Categoría",
-        #         style=InputTextStyle.short,
-        #         value=category,
-        #         required=True
-        #     )
-        # )
         self.add_item(
             InputText(
                 label="Prioridad (0-10)",
@@ -56,14 +45,6 @@ class ConfirmationModal(Modal):
                 required=False,
             )
         )
-        # self.add_item(
-        #     InputText(
-        #         label="Nota del Revisor",
-        #         style=InputTextStyle.long,
-        #         value="",
-        #         required=False,
-        #     )
-        # )
 
         self._id = domain_id
         self._reason = reason
@@ -125,7 +106,7 @@ class ConfirmationModal(Modal):
             embed = Embed(
                 color=Color.yellow(),
                 title="ERROR",
-                description="El bot está en la blacklist.",
+                description="El discord está en la blacklist.",
             )
         elif response.status_code == 404:
             embed = Embed(
