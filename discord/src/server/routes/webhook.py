@@ -3,13 +3,12 @@ import json
 import os
 import re
 
-import helpers.url_analyzer as url_analyzer
+import src.helpers.url_analyzer as url_analyzer
 import requests
-from discord import Color
 from flask import jsonify, request
 import hashlib
 
-from constants import MALICIOUS_CATEGORIES
+from src.constants import MALICIOUS_CATEGORIES
 
 
 def _get_last_element_or_string(data):
@@ -76,7 +75,7 @@ def webhook():
                     {
                         "title": "¡Nuevo Enlace a Revisar!",
                         "description": f"{final_url}",
-                        "color": int(Color.gold()),
+                        "color": 16761095,
                         "fields": [
                             {
                                 "name": "Categoría",

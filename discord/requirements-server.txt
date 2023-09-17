@@ -1,0 +1,8 @@
+pip
+python-dotenv
+Flask
+requests
+cryptography
+python-whois
+pyOpenSSL
+gunicorn

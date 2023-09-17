@@ -7,7 +7,7 @@ from discord import ApplicationContext, Option, Embed, Color, slash_command
 from discord.ext import commands
 
 from constants import MALICIOUS_CATEGORIES
-from helpers.url_analyzer import get_netloc
+from src.helpers.url_analyzer import get_netloc
 
 
 class Commands(commands.Cog):

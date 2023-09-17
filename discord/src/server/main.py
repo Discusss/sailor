@@ -1,5 +1,5 @@
 from flask import Flask
-from server.routes.webhook import webhook
+from src.server.routes.webhook import webhook
 
 from dotenv import load_dotenv
 
