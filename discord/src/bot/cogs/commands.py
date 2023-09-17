@@ -6,7 +6,7 @@ import requests
 from discord import ApplicationContext, Option, Embed, Color, slash_command
 from discord.ext import commands
 
-from constants import MALICIOUS_CATEGORIES
+from src.constants import MALICIOUS_CATEGORIES
 from src.helpers.url_analyzer import get_netloc
 
 

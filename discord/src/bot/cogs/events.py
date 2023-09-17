@@ -1,14 +1,13 @@
-import json
 import logging
 import os
 
-import constants as constants
+import src.constants as constants
 import discord
 import requests
 from discord import Embed
 from discord.ext import commands
 
-from bot.views.confirmation_modal import ConfirmationModal
+from src.bot.views.confirmation_modal import ConfirmationModal
 
 logger = logging.getLogger("BOT")
 
