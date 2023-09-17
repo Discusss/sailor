@@ -10,7 +10,7 @@ repository = "https://github.com/Discusss/phishing"
 license = "GPL-3"
 
 [workspace]
-members = [".", "migration"]
+members = [".", "migration", "io"]
 
 [profile.release]
 debug = false
@@ -27,6 +27,7 @@ rpath = false
 
 [dependencies]
 migration = { path = "migration" }
+io = { path = "io" }
 chrono = { version = "0.4.23", features = ["serde"] }
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rocket_cors = { version = "0.6.0-alpha2" }

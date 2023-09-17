@@ -1,22 +1,13 @@
 // thanks to https://github.com/stainless-steel/md5
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
-#[cfg(feature = "std")]
-use std as core;
-
-use core::convert;
 use core::fmt;
 use core::ops;
-
-#[cfg(feature = "std")]
-use core::io;
 
 /// A digest.
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
 pub struct Digest(pub [u8; 16]);
 
-impl convert::From<Digest> for [u8; 16] {
+impl From<Digest> for [u8; 16] {
     #[inline]
     fn from(digest: Digest) -> Self {
         digest.0
@@ -89,13 +80,6 @@ impl Context {
     }
 
     /// Consume data.
-    #[cfg(target_pointer_width = "32")]
-    #[inline]
-    pub fn consume<T: AsRef<[u8]>>(&mut self, data: T) {
-        consume(self, data.as_ref());
-    }
-
-    /// Consume data.
     #[cfg(target_pointer_width = "64")]
     pub fn consume<T: AsRef<[u8]>>(&mut self, data: T) {
         for chunk in data.as_ref().chunks(core::u32::MAX as usize) {
@@ -118,7 +102,7 @@ impl Context {
             input[i] = ((self.buffer[j + 3] as u32) << 24) |
                 ((self.buffer[j + 2] as u32) << 16) |
                 ((self.buffer[j + 1] as u32) <<  8) |
-                ((self.buffer[j    ] as u32)      );
+                (self.buffer[j    ] as u32);
             j += 4;
         }
         transform(&mut self.state, &input);
@@ -135,7 +119,7 @@ impl Context {
     }
 }
 
-impl convert::From<Context> for Digest {
+impl From<Context> for Digest {
     #[inline]
     fn from(context: Context) -> Digest {
         context.compute()
@@ -189,7 +173,7 @@ fn consume(
                 input[i] = ((buffer[j + 3] as u32) << 24) |
                     ((buffer[j + 2] as u32) << 16) |
                     ((buffer[j + 1] as u32) <<  8) |
-                    ((buffer[j    ] as u32)      );
+                    (buffer[j    ] as u32);
                 j += 4;
             }
             transform(state, &input);

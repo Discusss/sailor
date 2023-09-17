@@ -8,7 +8,6 @@ use rocket::shield::Shield;
 use migration::{Migrator, MigratorTrait};
 use rocket_cors::AllowedHeaders;
 use crate::structs::auth::validate_master_key;
-use fern::colors::{Color, ColoredLevelConfig};
 
 #[macro_use]
 extern crate rocket;
@@ -17,6 +16,7 @@ extern crate fern;
 #[macro_use]
 extern crate log;
 extern crate chrono;
+extern crate io;
 
 mod db;
 mod routes;
@@ -24,18 +24,12 @@ mod utils;
 mod entities;
 mod structs;
 pub(crate) mod security;
-
-/*
-
-    ==== Webhook ====
-    POST /webhook (with JSON body) --> Mandar al bot de discord información sobre un nuevo dominio
-    HEADER X-LACABRA-Signature MD5(body + secret) --> Para validar que el webhook viene de nosotros (key: "asdf" EN DESARROLLO)
-    BODY: esquema entero
- */
+mod logger;
 
 #[rocket::main]
 async fn main() {
-    setup_logger().expect("Failed to setup logger");
+
+    logger::source::setup_logger().expect("Failed to setup logger");
     dotenv().ok();
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -88,30 +82,4 @@ async fn main() {
     {
         error!("Error: {}", e);
     }
-}
-
-fn setup_logger() -> Result<(), fern::InitError> {
-
-    let mut colors = ColoredLevelConfig::new();
-    colors.warn = Color::Yellow;
-    colors.info = Color::Green;
-    colors.error = Color::Red;
-    colors.debug = Color::BrightBlack;
-    colors.trace = Color::Magenta;
-
-    fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{}: {} {} - {}",
-                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                record.target(),
-                colors.color(record.level()),
-                message
-            ))
-        })
-        .level(log::LevelFilter::Info)
-        .chain(std::io::stdout())
-        .chain(fern::log_file("output.log")?)
-        .apply()?;
-    Ok(())
 }

@@ -35,6 +35,4 @@ WORKDIR ${APP}
 
 ENV RUST_LOG=info
 
-# TODO: fix glibc
-
 CMD ["./phishing"]
