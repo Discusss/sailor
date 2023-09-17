@@ -194,7 +194,7 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         .send_json(webhook_data) {
         Ok(_) => (),
         Err(e) => {
-            log::error!("Error sending webhook: {}", e);
+            error!("Error sending webhook: {}", e);
         },
     }
 
