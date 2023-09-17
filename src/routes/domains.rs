@@ -12,6 +12,7 @@ use crate::structs::ip::RemoteAddress;
 use crate::structs::types::LinkType;
 use crate::utils::parser;
 use crate::utils::response::DataResponse;
+use crate::security::md5;
 
 #[get("/domain?<domain>")]
 pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, domain: String, auth: Auth) -> Result<status::Custom<Json<DataResponse>>, Status> {
@@ -157,6 +158,45 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         Ok(domain) => domain,
         Err(_) => return Err(Status::InternalServerError),
     };
+
+    let mut webhook_url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL must be set");
+    let webhook_secret = std::env::var("WEBHOOK_HASH_KEY").expect("WEBHOOK_HASH_KEY must be set");
+    if webhook_url.ends_with("/") {
+        webhook_url = webhook_url + "webhook"
+    } else {
+        webhook_url = webhook_url + "/webhook"
+    }
+
+    let webhook_data = json!({
+            "id": new_domain.id,
+            "domain": new_domain.domain,
+            "category": LinkType::from_code(&new_domain.category).to_info(),
+            "priority": new_domain.priority,
+            "notes": new_domain.public_notes,
+            "submitted_by": new_domain.submitted_by,
+            "submitted_at": new_domain.submitted_at,
+            "submitted_ip": new_domain.submitted_ip.unwrap_or("N/A".to_string()),
+            "submitted_user_agent": new_domain.submitted_user_agent.unwrap_or("N/A".to_string()),
+            "submitted_reason": new_domain.submitted_reason,
+            "approved_by": new_domain.approved_by.unwrap_or("N/A".to_string()),
+            "approved_at": new_domain.approved_at,
+            "approved_key": new_domain.approved_key.unwrap_or("N/A".to_string()),
+            "notes": new_domain.notes,
+            "times_consulted": new_domain.times_consulted,
+        });
+
+    let hash = md5::compute(webhook_data.to_string() + &*webhook_secret);
+
+    match ureq::post(&webhook_url)
+        .set("Content-Type", "application/json")
+        .set("User-Agent", "LA-CABRA Phishing API")
+        .set("X-LACABRA-Signature", &*format!("{:x}", hash))
+        .send_json(webhook_data) {
+        Ok(_) => (),
+        Err(e) => {
+            log::error!("Error sending webhook: {}", e);
+        },
+    }
 
     let response_json = DataResponse {
         status: "200".to_string(),
