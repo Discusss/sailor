@@ -21,15 +21,24 @@ class Commands(commands.Cog):
     async def reportar(
             self,
             ctx: ApplicationContext,
-            link: Option(str, name="enlace", required=True),
-            reason: Option(str, name="razón", required=True),
+            link: Option(str, name="enlace", required=True, description="El enlace a reportar."),
+            reason: Option(str, name="razón", required=True, description="Razón por la que estás reportando el enlace."),
             category: Option(
-                str, name="categoría", choices=MALICIOUS_CATEGORIES, required=False
+                str,
+                name="categoría",
+                choices=MALICIOUS_CATEGORIES,
+                required=False,
+                description="La categoría que mejor se adapta al enlace a reportar."
             ),
             priority: Option(
-                int, name="prioridad", min_value=0, max_value=10, required=False
+                int,
+                name="prioridad",
+                min_value=0,
+                max_value=10,
+                required=False,
+                description="El nivel de peligrosidad que crees que representa el enlace."
             ),
-            notes: Option(str, name="nota", required=False),
+            notes: Option(str, name="nota", required=False, description="Cualquier otro detalle que quieras proporcionar."),
     ):
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
@@ -88,7 +97,7 @@ class Commands(commands.Cog):
     async def comprobar(
             self,
             ctx: ApplicationContext,
-            link: Option(str, name="enlace", required=True)
+            link: Option(str, name="enlace", required=True, description="El enlace a comprobar.")
     ):
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
