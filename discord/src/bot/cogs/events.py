@@ -43,7 +43,7 @@ class Events(commands.Cog):
 
             if interaction.custom_id == "rejected-link":
                 response = requests.delete(
-                    url=os.getenv("BASE_API_URL") + "/domain",
+                    url=os.getenv("API_BASE_URL") + "/domain",
                     params={"id": domain_id},
 
                     headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")}
