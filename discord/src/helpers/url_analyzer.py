@@ -1,14 +1,11 @@
 import socket
 from urllib.parse import urlparse
 
+import whois
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from cryptography.hazmat.backends import default_backend
-
-import whois
-
-
 from cryptography.hazmat.primitives import serialization
 
 

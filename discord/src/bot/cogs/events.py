@@ -1,12 +1,12 @@
 import logging
 import os
 
-import src.constants as constants
 import discord
 import requests
 from discord import Embed
 from discord.ext import commands
 
+import src.constants as constants
 from src.bot.views.confirmation_modal import ConfirmationModal
 
 logger = logging.getLogger("BOT")
@@ -85,7 +85,6 @@ class Events(commands.Cog):
                 return
             elif interaction.custom_id == "approved-link":
                 # Get information of the report based on the embed.
-                link = interaction.message.embeds[0].description
                 category = interaction.data.get("values", ["Other"])[0]
                 priority = interaction.message.embeds[0].fields[1].value
                 reason = interaction.message.embeds[0].fields[-2].value
@@ -95,7 +94,6 @@ class Events(commands.Cog):
                 await interaction.response.send_modal(
                     ConfirmationModal(
                         domain_id,
-                        link,
                         category,
                         priority,
                         reason,

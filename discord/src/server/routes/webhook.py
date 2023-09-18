@@ -1,13 +1,13 @@
 import datetime
+import hashlib
 import json
 import os
 import re
 
-import src.helpers.url_analyzer as url_analyzer
 import requests
 from flask import jsonify, request
-import hashlib
 
+import src.helpers.url_analyzer as url_analyzer
 from src.constants import MALICIOUS_CATEGORIES
 
 

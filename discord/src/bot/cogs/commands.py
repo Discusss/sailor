@@ -3,7 +3,7 @@ import os
 import re
 
 import requests
-from discord import ApplicationContext, Option, Embed, Color, slash_command
+from discord import ApplicationContext, Color, Embed, Option, slash_command
 from discord.ext import commands
 
 from src.constants import MALICIOUS_CATEGORIES

@@ -12,7 +12,6 @@ class ConfirmationModal(Modal):
     def __init__(
         self,
         domain_id: int,
-        link: str,
         category: str,
         priority: int,
         reason: str,
