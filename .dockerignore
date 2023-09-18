@@ -6,3 +6,4 @@
 !Dockerfile
 !assets/favicon.ico
 !.cargo
+!Rocket.toml
