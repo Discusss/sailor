@@ -112,12 +112,13 @@ class Commands(commands.Cog):
         if response.status_code == 200:
             embed = Embed(
                 title=f"Información de {netloc}",
-                color=Color.greyple()
+                color=Color.greyple(),
+                description="Enlace encontrado en la base de datos, ¡ten cuidado!"
             )
             embed\
-                .add_field(name="Categoría", value=body.get("category"), inline=True)\
-                .add_field(name="Prioridad", value=body.get("priority"), inline=True)\
-                .add_field(name="Notas", value=body.get("notes"))
+                .add_field(name="Categoría", value=MALICIOUS_CATEGORIES[int(body.get("category", 7))], inline=True)\
+                .add_field(name="Prioridad", value=body.get("priority", "Sin prioridad."), inline=True)\
+                .add_field(name="Notas", value=body.get("public_notes", "Sin notas."))
         else:
             embed = Embed(
                 title="No encontrado",
