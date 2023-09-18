@@ -36,9 +36,8 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       API_BASE_URL: http://phishing-api:8000
       API_AUTH_TOKEN: ${MASTER_KEY}
-      WEBHOOK_URL: http://webhook:5001
       WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
-      PYTHON_PATH: /bot
+      PYTHONPATH: /bot
 
   postgres:
     container_name: phishing-postgres
