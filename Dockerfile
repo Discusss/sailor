@@ -20,8 +20,6 @@ FROM debian:12.1-slim
 
 ARG APP=/usr/src/app
 
-EXPOSE 8000
-
 ENV TZ=Etc/UTC \
     APP_USER=pworker
 
@@ -33,6 +31,8 @@ COPY --from=builder /phishing/target/release/phishing ${APP}/phishing
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 RUN ldd --version
+
+EXPOSE 8000
 
 USER $APP_USER
 WORKDIR ${APP}
