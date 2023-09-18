@@ -8,7 +8,7 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 
-        manager
+        let res = manager
             .create_table(
                 Table::create()
                     .table(Domains::Table)
@@ -37,15 +37,19 @@ impl MigrationTrait for Migration {
 
                     .col(ColumnDef::new(Domains::Notes).string().not_null().default(""))
                     .col(ColumnDef::new(Domains::TimesConsulted).integer().not_null().default(0))
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("domains_approved_key_fkey")
-                            .from(Keys::Table, Keys::Key)
-                            .to(Domains::Table, Domains::ApprovedKey)
-                    )
                     .to_owned(),
             )
-            .await
+            .await;
+
+        manager.create_foreign_key(
+            ForeignKey::create()
+                .name("domains_approved_key_fkey")
+                .from(Domains::Table, Domains::ApprovedKey)
+                .to(Keys::Table, Keys::Key)
+                .to_owned()
+        ).await?;
+
+        res
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
