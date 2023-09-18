@@ -60,7 +60,7 @@ def get_domain_registration_info(domain):
             "updated_date": domain_info.updated_date,
             "expiration_date": domain_info.expiration_date,
         }
-    except whois.exceptions.FailedParsingWhoisOutput:
+    except Exception:
         try:
             domain_info = whois.whois("http://" + domain)
 
@@ -71,7 +71,7 @@ def get_domain_registration_info(domain):
                 "updated_date": domain_info.updated_date,
                 "expiration_date": domain_info.expiration_date,
             }
-        except whois.exceptions.FailedParsingWhoisOutput:
+        except Exception:
             return {
                 "is_registered": False,
                 "registrar": None,
