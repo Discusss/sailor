@@ -45,7 +45,7 @@ class Commands(commands.Cog):
             color=Color.gold(),
             description="Reportando el enlace...",
         )
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, ephemeral=True)
 
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
