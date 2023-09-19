@@ -134,7 +134,7 @@ class Commands(commands.Cog):
             embed\
                 .add_field(name="Categoría", value=body.get("category", "Otro."), inline=True)\
                 .add_field(name="Prioridad", value=body.get("priority", "Sin prioridad."), inline=True)\
-                .add_field(name="Notas", value=body.get("public_notes", "Sin notas."))
+                .add_field(name="Notas", value=body.get("notes", "Sin notas."))
         else:
             embed = Embed(
                 title="No encontrado",
