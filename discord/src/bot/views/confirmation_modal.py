@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 import requests
@@ -50,6 +51,7 @@ class ConfirmationModal(Modal):
         self._category = category
         self._original_priority = priority
         self._original_interaction = original_interaction
+        self._logger = logging.getLogger("REVIEWS")
 
     async def callback(self, interaction: Interaction):
         priority = self.children[0].value
@@ -70,7 +72,7 @@ class ConfirmationModal(Modal):
             return
 
         response = requests.patch(
-            url=os.getenv("API_BASE_URL") + "/domain",
+            url=os.getenv("API_BASE_URL") + "/api/domain",
             params={"id": self._id},
             headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")},
             data=json.dumps(
@@ -89,6 +91,7 @@ class ConfirmationModal(Modal):
                 title="Gracias por la valoración",
                 description="Enlace aprobado.",
             )
+            self._logger.info(f"{self._id} has been approved by {interaction.user.name}")
         elif response.status_code == 400:
             embed = Embed(
                 color=Color.yellow(),
@@ -119,4 +122,17 @@ class ConfirmationModal(Modal):
             )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
-        await self._original_interaction.delete_original_response()
+        embeds = self._original_interaction.message.embeds
+        if len(embeds) > 0:
+            embed = embeds[0].to_dict()
+            embed["title"] = "Enlace aprobado"
+            embed["color"] = int(Color.green())
+            embed["fields"][0]["value"] = self._category
+            embed["fields"][1]["value"] = str(priority)
+            embed["fields"][-1]["value"] = user_note
+
+            await interaction.message.edit(
+                content=interaction.message.content,
+                embeds=[Embed.from_dict(embed)],
+                view=None
+            )

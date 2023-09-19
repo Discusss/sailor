@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
-      API_BASE_URL: http://phishing-api:8000/api
+      API_BASE_URL: http://phishing-api:8000
       API_AUTH_KEY: ${MASTER_KEY}
       WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
       PYTHONPATH: /bot

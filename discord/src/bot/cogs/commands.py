@@ -40,6 +40,13 @@ class Commands(commands.Cog):
             ),
             notes: Option(str, name="nota", required=False, description="Cualquier otro detalle que quieras proporcionar."),
     ):
+        embed = Embed(
+            title="Reporte de Enlaces",
+            color=Color.gold(),
+            description="Reportando el enlace...",
+        )
+        await ctx.respond(embed=embed)
+
         urls = re.search(r"(?:(?:https?|ftp)://)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", link)
 
         if urls is None:
@@ -48,13 +55,13 @@ class Commands(commands.Cog):
                 color=Color.red(),
                 description="No se ha detectado ningún enlace.",
             )
-            await ctx.respond(embed=embed)
+            await ctx.edit(embed=embed)
             return
 
         netloc = get_netloc(urls[0])
 
         response = requests.post(
-            url=os.getenv("API_BASE_URL") + "/domain",
+            url=os.getenv("API_BASE_URL") + "/api/domain",
             data=json.dumps(
                 {
                     "domain": netloc,
@@ -88,7 +95,7 @@ class Commands(commands.Cog):
                 description="Ha ocurrido un error inesperado.",
             )
 
-        await ctx.respond(embed=embed)
+        await ctx.edit(embed=embed)
 
     @slash_command(
         description="Obtén información de un enlace.",
@@ -107,25 +114,25 @@ class Commands(commands.Cog):
                 color=Color.red(),
                 description="No se ha detectado ningún enlace.",
             )
-            await ctx.respond(embed=embed)
+            await ctx.edit(embed=embed)
             return
 
         netloc = get_netloc(urls[0])
 
         response = requests.get(
-            url=os.getenv("API_BASE_URL") + "/domain",
+            url=os.getenv("API_BASE_URL") + "/api/domain",
             params={"domain": netloc}
         )
 
-        body = dict(response.json())["data"]
         if response.status_code == 200:
+            body = dict(response.json())["data"]
             embed = Embed(
                 title=f"Información de {netloc}",
                 color=Color.greyple(),
                 description="Enlace encontrado en la base de datos, ¡ten cuidado!"
             )
             embed\
-                .add_field(name="Categoría", value=MALICIOUS_CATEGORIES[int(body.get("category", 7))], inline=True)\
+                .add_field(name="Categoría", value=body.get("category", "Otro."), inline=True)\
                 .add_field(name="Prioridad", value=body.get("priority", "Sin prioridad."), inline=True)\
                 .add_field(name="Notas", value=body.get("public_notes", "Sin notas."))
         else:
@@ -136,6 +143,35 @@ class Commands(commands.Cog):
             )
 
         await ctx.respond(embed=embed)
+
+    @slash_command(
+        description="Comprueba algunas estadísticas de la API.",
+        guild_only=True
+    )
+    async def estadisticas(
+            self,
+            ctx: ApplicationContext
+    ):
+        response = requests.get(
+            url=os.getenv("API_BASE_URL") + "/stats"
+        )
+
+        if response.status_code != 200:
+            embed = Embed(
+                color=Color.red(),
+                description="Ha ocurrido un error, por favor, prueba más tarde."
+            )
+            await ctx.respond(embed=embed, ephemeral=True)
+        else:
+            body = dict(response.json())["data"]
+            embed = Embed(
+                title="Estadísticas de la API",
+                color=Color.nitro_pink(),
+                description="**Dominios más buscados:**\n\n{0}".format('\n'.join(map(lambda x: x['domain'], body['top_5_domains']))),
+            )
+            embed.add_field(name="Total de dominios", value=body['total_domains'])
+            embed.add_field(name="Usuarios baneados", value=body['blacklisted_count'])
+            await ctx.respond(embed=embed)
 
 
 def setup(bot):

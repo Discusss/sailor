@@ -15,6 +15,7 @@ logger = logging.getLogger("BOT")
 class Events(commands.Cog):
     def __init__(self, bot: discord.Bot):
         self._bot = bot
+        self._logger = logging.getLogger("REVIEWS")
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -43,7 +44,7 @@ class Events(commands.Cog):
 
             if interaction.custom_id == "rejected-link":
                 response = requests.delete(
-                    url=os.getenv("BASE_API_URL") + "/domain",
+                    url=os.getenv("API_BASE_URL") + "/api/domain",
                     params={"id": domain_id},
 
                     headers={'Content-Type': 'application/json', "Authorization": os.getenv("API_AUTH_KEY")}
@@ -55,6 +56,7 @@ class Events(commands.Cog):
                         title="Gracias por la valoración",
                         description="Enlace rechazado.",
                     )
+                    self._logger.info(f"{domain_id} has been rejected by {interaction.user.name}")
                 elif response.status_code == 401:
                     embed = Embed(
                         color=discord.Color.yellow(),
@@ -81,7 +83,17 @@ class Events(commands.Cog):
                     )
 
                 await interaction.response.send_message(embed=embed, ephemeral=True)
-                await interaction.delete_original_response()
+                embeds = interaction.message.embeds
+                if len(embeds) > 0:
+                    embed = embeds[0].to_dict()
+                    embed["title"] = "Enlace rechazado"
+                    embed["color"] = int(discord.Color.red())
+
+                    await interaction.message.edit(
+                        content=interaction.message.content,
+                        embeds=[Embed.from_dict(embed)],
+                        view=None
+                    )
                 return
             elif interaction.custom_id == "approved-link":
                 # Get information of the report based on the embed.
