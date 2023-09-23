@@ -1,14 +1,14 @@
 openapi: 3.1.0
 
 info:
-  title: Phishing API
+  title: Sailor API
   summary: Una base de datos con miles enlaces maliciosos.
   description: Una base de datos colaborativa con enlaces maliciosos centrada pero no dedicada en la moderación de Discord.
   termsOfService: 'https://discusss.gitbook.io/phishing/informacion'
   contact:
     name: 'Discusss'
     url: 'https://discord.gg/SJqrGP7'
-    email: 'admin@lacabra.app'
+    email: 'team@lacabra.app'
   license:
     name: GPL-3.0
     url: 'https://www.gnu.org/licenses/gpl-3.0.html'
@@ -102,9 +102,9 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (200)'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (200)'
                 data:
                   type: object
                   description: 'Usuario añadido'
@@ -351,12 +351,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -420,12 +420,12 @@ paths:
               schema:
                 type: object
                 properties:
-                status:
-                  type: string
-                  description: 'Estado de la petición (404)'
-                message:
-                  type: string
-                  description: 'Mensaje de error'
+                  status:
+                    type: string
+                    description: 'Estado de la petición (404)'
+                  message:
+                    type: string
+                    description: 'Mensaje de error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 

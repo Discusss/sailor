@@ -2,13 +2,13 @@ version: "3.8"
 
 services:
   api:
-    container_name: phishing-api
-    image: discusss/phishing:latest
+    container_name: sailor-api
+    image: discusss/sailor:latest
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgres://phishing:phishing@phishing-postgres:5432/phishing
+      DATABASE_URL: postgres://sailor:sailor@sailor-postgres:5432/sailor
       PROMETHEUS_KEY: ${PROMETHEUS_KEY}
       MASTER_KEY: ${MASTER_KEY}
       WEBHOOK_URL: http://webhook:5001
@@ -36,29 +36,29 @@ services:
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
-      API_BASE_URL: http://phishing-api:8000
+      API_BASE_URL: http://sailor-api:8000
       API_AUTH_KEY: ${MASTER_KEY}
       WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
       PYTHONPATH: /bot
 
   postgres:
-    container_name: phishing-postgres
+    container_name: sailor-postgres
     image: postgres:15.2-alpine
     restart: unless-stopped
     ports:
       - 5432:5432
     healthcheck:
-      test: pg_isready -U phishing -h localhost
+      test: pg_isready -U sailor -h localhost
       interval: 5s
       timeout: 5s
       retries: 10
     environment:
-      POSTGRES_USER: phishing
-      POSTGRES_PASSWORD: phishing
-      PGPASSWORD: phishing
+      POSTGRES_USER: sailor
+      POSTGRES_PASSWORD: sailor
+      PGPASSWORD: sailor
       PGPORT: 5432
       POSTGRES_PORT: 5432
-      POSTGRES_DB: phishing
-      PGDATABASE: phishing
+      POSTGRES_DB: sailor
+      PGDATABASE: sailor
     volumes:
       - ./postgres:/var/lib/postgresql/data
