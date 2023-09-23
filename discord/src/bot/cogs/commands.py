@@ -15,7 +15,7 @@ class Commands(commands.Cog):
         self.bot = bot
 
     @slash_command(
-        description="Reporta un enlace sospechoso de ser phishing y lo revisaremos.",
+        description="Reporta un enlace sospechoso y lo revisaremos.",
         guild_only=True
     )
     async def reportar(
