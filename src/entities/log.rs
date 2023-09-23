@@ -9,6 +9,7 @@ pub struct Model {
     pub version: String,
     pub environment: String,
     pub level: String,
+    pub user: String,
     pub log_event: String,
     pub file_path: String,
     pub data: String,
