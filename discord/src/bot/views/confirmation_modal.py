@@ -14,7 +14,7 @@ class ConfirmationModal(Modal):
         self,
         domain_id: int,
         category: str,
-        priority: int,
+        severity: int,
         reason: str,
         note: str,
         original_interaction: Interaction,
@@ -26,14 +26,14 @@ class ConfirmationModal(Modal):
         if note == "Sin nota.":
             note = ""
 
-        if priority == "Sin prioridad.":
-            priority = ""
+        if severity == "Sin severidad.":
+            severity = ""
 
         self.add_item(
             InputText(
                 label="Prioridad (0-10)",
                 style=InputTextStyle.short,
-                value=str(priority),
+                value=str(severity),
                 required=True
             )
         )
@@ -49,25 +49,25 @@ class ConfirmationModal(Modal):
         self._id = domain_id
         self._reason = reason
         self._category = category
-        self._original_priority = priority
+        self._original_priority = severity
         self._original_interaction = original_interaction
         self._logger = logging.getLogger("REVIEWS")
 
     async def callback(self, interaction: Interaction):
-        priority = self.children[0].value
+        severity = self.children[0].value
         user_note = self.children[1].value
 
-        if not priority.isnumeric():
+        if not severity.isnumeric():
             await interaction.response.send_message(
-                "Proporciona una prioridad válida.", ephemeral=True
+                "Proporciona una severidad válida.", ephemeral=True
             )
             return
         else:
-            priority = int(priority)
+            severity = int(severity)
 
-        if 0 > priority > 10:
+        if 0 > severity > 10:
             await interaction.response.send_message(
-                "Proporciona una prioridad válida.", ephemeral=True
+                "Proporciona una severidad válida.", ephemeral=True
             )
             return
 
@@ -78,7 +78,7 @@ class ConfirmationModal(Modal):
             data=json.dumps(
                 {
                     "category": MALICIOUS_CATEGORIES[self._category],
-                    "priority": priority,
+                    "severity": severity,
                     "public_notes": user_note,
                     "approved_by": interaction.user.name,
                 }
@@ -128,7 +128,7 @@ class ConfirmationModal(Modal):
             embed["title"] = "Enlace aprobado"
             embed["color"] = int(Color.green())
             embed["fields"][0]["value"] = self._category
-            embed["fields"][1]["value"] = str(priority)
+            embed["fields"][1]["value"] = str(severity)
             embed["fields"][-1]["value"] = user_note
 
             await interaction.message.edit(

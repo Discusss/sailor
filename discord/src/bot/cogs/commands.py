@@ -30,9 +30,9 @@ class Commands(commands.Cog):
                 required=False,
                 description="La categoría que mejor se adapta al enlace a reportar."
             ),
-            priority: Option(
+            severity: Option(
                 int,
-                name="prioridad",
+                name="severidad",
                 min_value=0,
                 max_value=10,
                 required=False,
@@ -68,7 +68,7 @@ class Commands(commands.Cog):
                     "category": MALICIOUS_CATEGORIES[category]
                     if category is not None
                     else None,
-                    "priority": priority,
+                    "severity": severity,
                     "submitted_by": ctx.user.name,
                     "reason": reason,
                     "notes": notes,
@@ -133,7 +133,7 @@ class Commands(commands.Cog):
             )
             embed\
                 .add_field(name="Categoría", value=body.get("category", "Otro."), inline=True)\
-                .add_field(name="Prioridad", value=body.get("priority", "Sin prioridad."), inline=True)\
+                .add_field(name="Severidad", value=body.get("severity", "Sin severidad."), inline=True)\
                 .add_field(name="Notas", value=body.get("notes", "Sin notas."))
         else:
             embed = Embed(

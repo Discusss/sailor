@@ -14,7 +14,7 @@ La manera más rápida de hacerlo si quieres un proceso lo más simple posible e
 
 Otra manera de hacerlo, mucho más cómoda si estás en Discord, es mediante nuestro bot oficial. Es tan fácil como usar el slash command que ves a continuación:
 
-<figure><img src="../.gitbook/assets/image.png" alt="/reportar <enlace> <razón> [categoría] [prioridad] [nota]"><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image.png" alt="/reportar <enlace> <razón> [categoría] [severidad] [nota]"><figcaption></figcaption></figure>
 
 Como ves, se trata del comando `/reportar`, y el propio comando te indica qué debes proporcionar, siendo "enlace" y "razón" los únicos valores obligatorios.
 

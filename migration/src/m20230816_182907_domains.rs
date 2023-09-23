@@ -22,7 +22,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(Domains::Domain).string().not_null())
                     .col(ColumnDef::new(Domains::Category).integer().not_null().default(7))
-                    .col(ColumnDef::new(Domains::Priority).integer().not_null().default(0))
+                    .col(ColumnDef::new(Domains::Severity).integer().not_null().default(0))
                     .col(ColumnDef::new(Domains::PublicNotes).string().not_null().default(""))
 
                     .col(ColumnDef::new(Domains::SubmittedBy).string().not_null())
@@ -63,7 +63,7 @@ impl MigrationTrait for Migration {
     id serial primary key not null,
     domain text not null,
     category int not null default 7,
-    priority int not null default 0,
+    severity int not null default 0,
     public_notes text not null default '',
 
     submitted_by text not null, -- the username of the user who submitted the link
@@ -85,7 +85,7 @@ pub enum Domains {
     Id,
     Domain,
     Category,
-    Priority,
+    Severity,
     PublicNotes,
 
     SubmittedBy,

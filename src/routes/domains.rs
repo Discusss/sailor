@@ -51,7 +51,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
     let mut json = json!({
             "domain": domain_info.domain,
             "category": category,
-            "priority": domain_info.priority,
+            "severity": domain_info.severity,
             "notes": domain_info.public_notes,
             "submitted_by": domain_info.submitted_by,
             "submitted_at": domain_info.submitted_at,
@@ -63,7 +63,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
                 "id": domain_info.id,
                 "domain": domain_info.domain,
                 "category": category,
-                "priority": domain_info.priority,
+                "severity": domain_info.severity,
                 "public_notes": domain_info.public_notes,
                 "submitted_by": domain_info.submitted_by,
                 "submitted_at": domain_info.submitted_at,
@@ -81,7 +81,7 @@ pub async fn get_domain(db: &State<DatabaseConnection>, remote: RemoteAddress, d
                 "id": domain_info.id,
                 "domain": domain_info.domain,
                 "category": category,
-                "priority": domain_info.priority,
+                "severity": domain_info.severity,
                 "public_notes": domain_info.public_notes,
                 "submitted_by": domain_info.submitted_by,
                 "submitted_at": domain_info.submitted_at,
@@ -139,7 +139,7 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
     let new_domain = domains::ActiveModel {
         domain: Set(body.domain.clone()),
         category: Set(body.category.unwrap_or(7)),
-        priority: Set(body.priority.unwrap_or(0)),
+        severity: Set(body.severity.unwrap_or(0)),
         public_notes: Set("".to_string()),
         submitted_by: Set(body.submitted_by.clone()),
         submitted_at: Set(now),
@@ -171,7 +171,7 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
             "id": new_domain.id,
             "domain": new_domain.domain,
             "category": LinkType::from_code(&new_domain.category).to_info(),
-            "priority": new_domain.priority,
+            "severity": new_domain.severity,
             "notes": new_domain.public_notes,
             "submitted_by": new_domain.submitted_by,
             "submitted_at": new_domain.submitted_at,
@@ -203,7 +203,7 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         data: json!({
             "domain": new_domain.domain,
             "category": LinkType::from_code(&new_domain.category).to_info(),
-            "priority": new_domain.priority,
+            "severity": new_domain.severity,
             "notes": new_domain.public_notes,
             "submitted_by": new_domain.submitted_by,
             "submitted_at": new_domain.submitted_at,
@@ -247,10 +247,10 @@ pub async fn update_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         None => (),
     };
 
-    match &body.priority {
-        Some(priority) => {
-            update.priority = Set(*priority);
-            json["priority"] = json!(*priority);
+    match &body.severity {
+        Some(severity) => {
+            update.severity = Set(*severity);
+            json["severity"] = json!(*severity);
         }
         None => (),
     };
@@ -363,7 +363,7 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
                 "id": domain_info.id,
                 "domain": domain_info.domain,
                 "category": LinkType::from_code(&domain_info.category).to_info(),
-                "priority": domain_info.priority,
+                "severity": domain_info.severity,
                 "public_notes": domain_info.public_notes,
                 "submitted_by": domain_info.submitted_by,
                 "submitted_at": domain_info.submitted_at,
@@ -382,7 +382,7 @@ pub async fn delete_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
 pub struct CreateDomainBody {
     pub domain: String,
     pub category: Option<i32>,
-    pub priority: Option<i32>,
+    pub severity: Option<i32>,
     pub notes: Option<String>,
     pub submitted_by: String,
     pub reason: String,
@@ -391,7 +391,7 @@ pub struct CreateDomainBody {
 #[derive(Serialize, Deserialize)]
 pub struct UpdateDomainBody {
     pub category: Option<i32>,
-    pub priority: Option<i32>,
+    pub severity: Option<i32>,
     pub public_notes: Option<String>,
     pub submitted_by: Option<String>,
     pub submitted_reason: Option<String>,

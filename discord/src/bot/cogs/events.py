@@ -98,7 +98,7 @@ class Events(commands.Cog):
             elif interaction.custom_id == "approved-link":
                 # Get information of the report based on the embed.
                 category = interaction.data.get("values", ["Other"])[0]
-                priority = interaction.message.embeds[0].fields[1].value
+                severity = interaction.message.embeds[0].fields[1].value
                 reason = interaction.message.embeds[0].fields[-2].value
                 user_note = interaction.message.embeds[0].fields[-1].value
 
@@ -107,7 +107,7 @@ class Events(commands.Cog):
                     ConfirmationModal(
                         domain_id,
                         category,
-                        priority,
+                        severity,
                         reason,
                         user_note,
                         interaction,

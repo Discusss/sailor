@@ -39,7 +39,7 @@ def webhook():
     domain_id: int = data.get("id")
     link: str = data.get("domain")
     category: str = data.get("category")
-    priority: int = data.get("priority")
+    severity: int = data.get("severity")
     reason: str = data.get("submitted_reason")
     note: str = data.get("public_notes")
 
@@ -85,10 +85,10 @@ def webhook():
                                 "inline": True,
                             },
                             {
-                                "name": "Priority",
-                                "value": priority
-                                if priority is not None
-                                else "Sin prioridad.",
+                                "name": "Severity",
+                                "value": severity
+                                if severity is not None
+                                else "Sin severidad.",
                                 "inline": True,
                             },
                             {

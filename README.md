@@ -12,11 +12,11 @@ Una base de datos colaborativa con enlaces maliciosos centrada pero no dedicada 
   - IP Grabber
 
 - Notes: Notas añadidas por los usuarios.
-- Priority: Del 1 al 10, con base en cómo puede afectar a los usuarios.
+- Severity: Del 1 al 10, con base en cómo puede afectar a los usuarios.
 
 ## Comandos del Bot
 
-- reportar <enlace> <razón> [tipo] [prioridad] [nota] - Disponible para todos los usuarios.
+- reportar <enlace> <razón> [tipo] [severidad] [nota] - Disponible para todos los usuarios.
 - comprobar <enlace>
 
 ## Configuración del archivo `.env`

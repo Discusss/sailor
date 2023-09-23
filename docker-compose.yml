@@ -21,7 +21,7 @@ services:
 
   webhook:
     container_name: webhook
-    image: discusss/webhook-server:latest
+    image: discusss/sailor-webhook-server:latest
     restart: unless-stopped
     ports:
       - "5001:5001"
@@ -31,8 +31,8 @@ services:
       WEBHOOK_HASH_KEY: ${WEBHOOK_HASH_KEY}
 
   bot:
-    container_name: phishing-bot
-    image: discusss/bot:latest
+    container_name: sailor-bot
+    image: discusss/sailor-bot:latest
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}

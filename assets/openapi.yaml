@@ -466,7 +466,7 @@ paths:
                       category:
                         type: string
                         description: 'Categoría del dominio'
-                      priority:
+                      severity:
                         type: integer
                         description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                       notes:
@@ -501,7 +501,7 @@ paths:
                       category:
                         type: string
                         description: 'Categoría del dominio'
-                      priority:
+                      severity:
                         type: integer
                         description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                       public_notes:
@@ -574,7 +574,7 @@ paths:
                 category:
                   type: string
                   description: 'Categoría del dominio'
-                priority:
+                severity:
                   type: integer
                   description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                 notes:
@@ -607,7 +607,7 @@ paths:
                       category:
                         type: string
                         description: 'Categoría del dominio'
-                      priority:
+                      severity:
                         type: integer
                         description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                       notes:
@@ -680,7 +680,7 @@ paths:
                 category:
                   type: string
                   description: 'Categoría del dominio'
-                priority:
+                severity:
                   type: integer
                   description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                 public_notes:
@@ -720,7 +720,7 @@ paths:
                       category:
                         type: string
                         description: 'Categoría del dominio, solo si se ha modificado'
-                      priority:
+                      severity:
                         type: integer
                         description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal, solo si se ha modificado'
                       public_notes:
@@ -810,7 +810,7 @@ paths:
                       category:
                         type: string
                         description: 'Categoría del dominio'
-                      priority:
+                      severity:
                         type: integer
                         description: 'Prioridad del dominio, en base a como de peligroso puede ser para un usuario normal'
                       public_notes:
