@@ -3,7 +3,7 @@ version: "3.8"
 services:
   api:
     container_name: phishing-api
-    image: phishing:latest
+    image: discusss/phishing:latest
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -21,7 +21,7 @@ services:
 
   webhook:
     container_name: webhook
-    image: webhook-server:latest
+    image: discusss/webhook-server:latest
     restart: unless-stopped
     ports:
       - "5001:5001"
@@ -32,7 +32,7 @@ services:
 
   bot:
     container_name: phishing-bot
-    image: bot:latest
+    image: discusss/bot:latest
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
