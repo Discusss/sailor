@@ -28,6 +28,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Log::Version).string().not_null().default("0.0.0"))
                     .col(ColumnDef::new(Log::Environment).string().not_null().default("production"))
                     .col(ColumnDef::new(Log::Level).string().not_null().default("info"))
+                    .col(ColumnDef::new(Log::User).string().not_null().default("system"))
                     .col(ColumnDef::new(Log::LogEvent).string().not_null().default("unknown"))
                     .col(ColumnDef::new(Log::FilePath).string().not_null().default(""))
                     .col(ColumnDef::new(Log::Data).string().not_null().default(""))
@@ -51,6 +52,7 @@ enum Log {
     Version,
     Environment,
     Level,
+    User,
     LogEvent,
     FilePath,
     Data

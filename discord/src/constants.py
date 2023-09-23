@@ -1,13 +1,13 @@
 VALID_CUSTOM_IDS = ["approved-link", "rejected-link"]
 
 MALICIOUS_CATEGORIES = {
-    "Phishing": 0,
-    "Malware": 1,
-    "Session Hijacking": 2,
-    "Cross-site Scripting (XSS)": 3,
-    "Click-jacking": 4,
-    "Social Engineering": 5,
-    "IP Grabber": 6,
-    "Scam": 7,
-    "Other": 8,
+    "Other": 0,
+    "Phishing": 1,
+    "Malware": 2,
+    "Session Hijacking": 3,
+    "Cross-site Scripting (XSS)": 4,
+    "Click-jacking": 5,
+    "Social Engineering": 6,
+    "IP Grabber": 7,
+    "Scam": 8,
 }
