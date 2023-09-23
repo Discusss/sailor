@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Domains::Domain).string().not_null())
-                    .col(ColumnDef::new(Domains::Category).integer().not_null().default(7))
+                    .col(ColumnDef::new(Domains::Category).integer().not_null().default(8))
                     .col(ColumnDef::new(Domains::Severity).integer().not_null().default(0))
                     .col(ColumnDef::new(Domains::PublicNotes).string().not_null().default(""))
 

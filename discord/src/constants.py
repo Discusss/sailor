@@ -9,4 +9,5 @@ MALICIOUS_CATEGORIES = {
     "Click-jacking": 5,
     "Social Engineering": 6,
     "IP Grabber": 7,
+    "Scam": 8,
 }

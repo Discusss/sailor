@@ -10,6 +10,8 @@ Una base de datos colaborativa con enlaces maliciosos centrada pero no dedicada 
   - Cross-site Scripting (XSS)
   - Click-jacking
   - IP Grabber
+  - Scam
+  - Other
 
 - Notes: Notas añadidas por los usuarios.
 - Severity: Del 1 al 10, con base en cómo puede afectar a los usuarios.

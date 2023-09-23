@@ -6,6 +6,7 @@ pub enum LinkType {
     ClickJacking,
     SocialEngineering,
     IpGrabber,
+    Scam,
     Other,
 }
 
@@ -19,6 +20,7 @@ impl LinkType {
             LinkType::ClickJacking => "Click-Jacking".to_string(),
             LinkType::SocialEngineering => "Social Engineering".to_string(),
             LinkType::IpGrabber => "IP Grabber".to_string(),
+            LinkType::Scam => "Scam".to_string(),
             LinkType::Other => "Other".to_string(),
         }
     }
@@ -32,7 +34,8 @@ impl LinkType {
             5 => LinkType::ClickJacking,
             6 => LinkType::SocialEngineering,
             7 => LinkType::IpGrabber,
-
+            8 => LinkType::Scam,
+          
             0 => LinkType::Other,
             _ => LinkType::Other,
         }
