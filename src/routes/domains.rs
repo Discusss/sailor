@@ -1,3 +1,4 @@
+use std::thread;
 use rocket::http::Status;
 use rocket::serde::json::{Json};
 use rocket::serde::json::serde_json::json;
@@ -159,44 +160,49 @@ pub async fn create_domain(db: &State<DatabaseConnection>, remote: RemoteAddress
         Err(_) => return Err(Status::InternalServerError),
     };
 
-    let mut webhook_url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL must be set");
-    let webhook_secret = std::env::var("WEBHOOK_HASH_KEY").expect("WEBHOOK_HASH_KEY must be set");
-    if webhook_url.ends_with("/") {
-        webhook_url = webhook_url + "webhook"
-    } else {
-        webhook_url = webhook_url + "/webhook"
-    }
+    let domain_data = new_domain.clone();
 
-    let webhook_data = json!({
-            "id": new_domain.id,
-            "domain": new_domain.domain,
-            "category": LinkType::from_code(&new_domain.category).to_info(),
-            "severity": new_domain.severity,
-            "notes": new_domain.public_notes,
-            "submitted_by": new_domain.submitted_by,
-            "submitted_at": new_domain.submitted_at,
-            "submitted_ip": new_domain.submitted_ip.unwrap_or("N/A".to_string()),
-            "submitted_user_agent": new_domain.submitted_user_agent.unwrap_or("N/A".to_string()),
-            "submitted_reason": new_domain.submitted_reason,
-            "approved_by": new_domain.approved_by.unwrap_or("N/A".to_string()),
-            "approved_at": new_domain.approved_at,
-            "approved_key": new_domain.approved_key.unwrap_or("N/A".to_string()),
-            "notes": new_domain.notes,
-            "times_consulted": new_domain.times_consulted,
+    thread::spawn(move || {
+
+        let mut webhook_url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL must be set");
+        let webhook_secret = std::env::var("WEBHOOK_HASH_KEY").expect("WEBHOOK_HASH_KEY must be set");
+        if webhook_url.ends_with("/") {
+            webhook_url = webhook_url + "webhook"
+        } else {
+            webhook_url = webhook_url + "/webhook"
+        }
+
+        let webhook_data = json!({
+            "id": domain_data.id,
+            "domain": domain_data.domain,
+            "category": LinkType::from_code(&domain_data.category).to_info(),
+            "severity": domain_data.severity,
+            "notes": domain_data.public_notes,
+            "submitted_by": domain_data.submitted_by,
+            "submitted_at": domain_data.submitted_at,
+            "submitted_ip": domain_data.submitted_ip.unwrap_or("N/A".to_string()),
+            "submitted_user_agent": domain_data.submitted_user_agent.unwrap_or("N/A".to_string()),
+            "submitted_reason": domain_data.submitted_reason,
+            "approved_by": domain_data.approved_by.unwrap_or("N/A".to_string()),
+            "approved_at": domain_data.approved_at,
+            "approved_key": domain_data.approved_key.unwrap_or("N/A".to_string()),
+            "notes": domain_data.notes,
+            "times_consulted": domain_data.times_consulted,
         });
 
-    let hash = md5::compute(webhook_data.to_string() + &*webhook_secret);
+        let hash = md5::compute(webhook_data.to_string() + &*webhook_secret);
 
-    match ureq::post(&webhook_url)
-        .set("Content-Type", "application/json")
-        .set("User-Agent", "LA-CABRA Phishing API")
-        .set("X-LACABRA-Signature", &*format!("{:x}", hash))
-        .send_json(webhook_data) {
-        Ok(_) => (),
-        Err(e) => {
-            error!("Error sending webhook: {}", e);
-        },
-    }
+        match ureq::post(&webhook_url)
+            .set("Content-Type", "application/json")
+            .set("User-Agent", "LA-CABRA Phishing API")
+            .set("X-LACABRA-Signature", &*format!("{:x}", hash))
+            .send_json(webhook_data) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("Error sending webhook: {}", e);
+            },
+        }
+    });
 
     let response_json = DataResponse {
         status: "200".to_string(),
