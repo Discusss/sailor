@@ -1,7 +1,6 @@
 pip
 py-cord
 python-dotenv
-Flask
 requests
 python-whois
 cryptography

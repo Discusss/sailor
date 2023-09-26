@@ -7,7 +7,7 @@ pub struct Model {
     pub id: i32,
     pub domain: String,
     pub category: i32,
-    pub priority: i32,
+    pub severity: i32,
     pub public_notes: String,
     pub submitted_by: String,
     pub submitted_at: DateTime,
