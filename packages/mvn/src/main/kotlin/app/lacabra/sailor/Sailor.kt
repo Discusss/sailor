@@ -53,7 +53,7 @@ object Sailor {
      * @param rawDomain The domain to get information about
      * @param key The key to use
      * @param urlOverride The URL to use instead of the default one, when null the default one will be used
-     * @return [DomainGetResponse] if the domain was found, null otherwise
+     * @return [DomainGetAdvancedResponse] if the domain was found, null otherwise
      * @throws InternalServerError If the API returned an internal server error
      * @throws BlacklistedError If the client IP is blacklisted
      * @throws BadRequestError If the request was malformed or the domain is invalid
@@ -69,6 +69,40 @@ object Sailor {
                 .authentication()
                 .bearer(key)
                 .awaitObjectResponse<GenericDomainGetAdvancedResponse>(kotlinxDeserializerOf())
+
+            response.third.data
+        } catch (e: FuelError) {
+            when (e.response.statusCode) {
+                400 -> throw BadRequestError()
+                403 -> throw BlacklistedError()
+                404 -> null
+                500 -> throw InternalServerError()
+                else -> throw e
+            }
+        }
+    }
+
+    /**
+     * Get extra information about the specified domain using a master key
+     * @param rawDomain The domain to get information about
+     * @param masterKey The master key
+     * @param urlOverride The URL to use instead of the default one, when null the default one will be used
+     * @return [DomainGetMasterResponse] if the domain was found, null otherwise
+     * @throws InternalServerError If the API returned an internal server error
+     * @throws BlacklistedError If the client IP is blacklisted
+     * @throws BadRequestError If the request was malformed or the domain is invalid
+     */
+    @Throws(InternalServerError::class, BlacklistedError::class, BadRequestError::class)
+    suspend fun getDomainWithMasterKey(rawDomain: String, masterKey: String, urlOverride: String = API_URL): DomainGetMasterResponse? {
+
+        val domain = formatDomain(rawDomain)
+
+        val url = URL(urlOverride)
+        return try {
+            val response = Fuel.get("$url/api/domain", listOf("domain" to domain))
+                .authentication()
+                .bearer(masterKey)
+                .awaitObjectResponse<GenericDomainGetMasterResponse>(kotlinxDeserializerOf())
 
             response.third.data
         } catch (e: FuelError) {

@@ -8,6 +8,7 @@ internal class SailorTest {
     private val url = "http://localhost:8000"
     private val testDomain = "https://google.com"
     private val key = System.getenv("SAILOR_KEY")
+    private val masterKey = System.getenv("SAILOR_MASTER_KEY")
 
     @org.junit.jupiter.api.Test
     fun getDomain() {
@@ -24,6 +25,17 @@ internal class SailorTest {
         runBlocking {
             assert(key != null && key.isNotEmpty())
             val domain = Sailor.getDomain(testDomain, key, urlOverride = url)
+            println(domain)
+        }
+
+    }
+
+    @org.junit.jupiter.api.Test
+    fun getDomainWithMasterKey() {
+
+        runBlocking {
+            assert(key != null && key.isNotEmpty())
+            val domain = Sailor.getDomainWithMasterKey(testDomain, masterKey, urlOverride = url)
             println(domain)
         }
 
