@@ -1,0 +1,7 @@
+pip
+py-cord
+python-dotenv
+requests
+python-whois
+cryptography
+pyOpenSSL

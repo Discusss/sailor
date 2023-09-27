@@ -1,7 +1,9 @@
 **
 !Cargo.toml
+!io
 !migration
 !src
 !Dockerfile
 !assets/favicon.ico
 !.cargo
+!Rocket.toml

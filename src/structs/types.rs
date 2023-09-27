@@ -6,6 +6,7 @@ pub enum LinkType {
     ClickJacking,
     SocialEngineering,
     IpGrabber,
+    Scam,
     Other,
 }
 
@@ -19,19 +20,23 @@ impl LinkType {
             LinkType::ClickJacking => "Click-Jacking".to_string(),
             LinkType::SocialEngineering => "Social Engineering".to_string(),
             LinkType::IpGrabber => "IP Grabber".to_string(),
+            LinkType::Scam => "Scam".to_string(),
             LinkType::Other => "Other".to_string(),
         }
     }
 
     pub fn from_code(code: &i32) -> LinkType {
         match code {
-            0 => LinkType::Phishing,
-            1 => LinkType::Malware,
-            2 => LinkType::SessionHijacking,
-            3 => LinkType::XSS,
-            4 => LinkType::ClickJacking,
-            5 => LinkType::SocialEngineering,
-            6 => LinkType::IpGrabber,
+            1 => LinkType::Phishing,
+            2 => LinkType::Malware,
+            3 => LinkType::SessionHijacking,
+            4 => LinkType::XSS,
+            5 => LinkType::ClickJacking,
+            6 => LinkType::SocialEngineering,
+            7 => LinkType::IpGrabber,
+            8 => LinkType::Scam,
+          
+            0 => LinkType::Other,
             _ => LinkType::Other,
         }
     }
