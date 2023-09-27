@@ -19,10 +19,16 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
+
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
     jvmToolchain(18)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 publishing {

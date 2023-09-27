@@ -4,10 +4,7 @@ import app.lacabra.sailor.exceptions.BadRequestError
 import app.lacabra.sailor.exceptions.BlacklistedError
 import app.lacabra.sailor.exceptions.ConflictError
 import app.lacabra.sailor.exceptions.InternalServerError
-import app.lacabra.sailor.responses.DomainGetAdvancedResponse
-import app.lacabra.sailor.responses.DomainGetResponse
-import app.lacabra.sailor.responses.DomainPostResponse
-import app.lacabra.sailor.responses.StatsGetResponse
+import app.lacabra.sailor.responses.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.extensions.authentication
@@ -22,7 +19,7 @@ object Sailor {
 
     /**
      * Get information about the specified domain
-     * @param domain The domain to get information about
+     * @param rawDomain The domain to get information about
      * @param urlOverride The URL to use instead of the default one, when null the default one will be used
      * @return [DomainGetResponse] if the domain was found, null otherwise
      * @throws InternalServerError If the API returned an internal server error
@@ -30,14 +27,16 @@ object Sailor {
      * @throws BadRequestError If the request was malformed or the domain is invalid
      */
     @Throws(InternalServerError::class, BlacklistedError::class, BadRequestError::class)
-    suspend fun getDomain(domain: String, urlOverride: String = API_URL): DomainGetResponse? {
+    suspend fun getDomain(rawDomain: String, urlOverride: String = API_URL): DomainGetResponse? {
+
+        val domain = formatDomain(rawDomain)
 
         val url = URL(urlOverride)
         return try {
             val response = Fuel.get("$url/api/domain", listOf("domain" to domain))
-                .awaitObjectResponse<DomainGetResponse>(kotlinxDeserializerOf())
+                .awaitObjectResponse<GenericDomainGetResponse>(kotlinxDeserializerOf())
 
-            response.third
+            response.third.data
         } catch (e: FuelError) {
             when (e.response.statusCode) {
                 400 -> throw BadRequestError()
@@ -51,7 +50,7 @@ object Sailor {
 
     /**
      * Get extra information about the specified domain using a key
-     * @param domain The domain to get information about
+     * @param rawDomain The domain to get information about
      * @param key The key to use
      * @param urlOverride The URL to use instead of the default one, when null the default one will be used
      * @return [DomainGetResponse] if the domain was found, null otherwise
@@ -60,16 +59,18 @@ object Sailor {
      * @throws BadRequestError If the request was malformed or the domain is invalid
      */
     @Throws(InternalServerError::class, BlacklistedError::class, BadRequestError::class)
-    suspend fun getDomain(domain: String, key: String, urlOverride: String = API_URL): DomainGetAdvancedResponse? {
+    suspend fun getDomain(rawDomain: String, key: String, urlOverride: String = API_URL): DomainGetAdvancedResponse? {
+
+        val domain = formatDomain(rawDomain)
 
         val url = URL(urlOverride)
         return try {
             val response = Fuel.get("$url/api/domain", listOf("domain" to domain))
                 .authentication()
                 .bearer(key)
-                .awaitObjectResponse<DomainGetAdvancedResponse>(kotlinxDeserializerOf())
+                .awaitObjectResponse<GenericDomainGetAdvancedResponse>(kotlinxDeserializerOf())
 
-            response.third
+            response.third.data
         } catch (e: FuelError) {
             when (e.response.statusCode) {
                 400 -> throw BadRequestError()
@@ -108,7 +109,7 @@ object Sailor {
 
     /**
      * Submit a domain to the API that will be reviewed by the staff and approved or rejected
-     * @param domain The domain to submit
+     * @param rawDomain The domain to submit
      * @param category [DomainCategory] of the domain, defaults to [DomainCategory.Other]
      * @param severity The severity of the domain, defaults to 0
      * @param notes Notes to add to the domain, defaults to ""
@@ -123,7 +124,7 @@ object Sailor {
      */
     @Throws(InternalServerError::class, BlacklistedError::class, BadRequestError::class, ConflictError::class)
     suspend fun submitDomain(
-        domain: String,
+        rawDomain: String,
         category: DomainCategory = DomainCategory.Other,
         severity: Int = 0,
         notes: String = "",
@@ -132,22 +133,27 @@ object Sailor {
         urlOverride: String = API_URL
     ): DomainPostResponse {
 
+        val domain = formatDomain(rawDomain)
+
         val url = URL(urlOverride)
         return try {
-            val response = Fuel.post("$url/api/domain")
-                .jsonBody(
-                    HashMap<String, Any>().apply {
-                        put("domain", domain)
-                        put("category", category.ordinal)
-                        put("severity", severity)
-                        put("notes", notes)
-                        put("submitted_by", submittedBy)
-                        put("reason", reason)
-                    }.toString()
-                )
-                .awaitObjectResponse<DomainPostResponse>(kotlinxDeserializerOf())
 
-            response.third
+            val data = """
+                {
+                    "domain": "$domain",
+                    "category": ${category.ordinal},
+                    "severity": $severity,
+                    "notes": "$notes",
+                    "submitted_by": "$submittedBy",
+                    "reason": "$reason"
+                }
+            """.trimIndent()
+
+            val response = Fuel.post("$url/api/domain")
+                .jsonBody(data)
+                .awaitObjectResponse<GenericDomainPostResponse>(kotlinxDeserializerOf())
+
+            response.third.data
         } catch (e: FuelError) {
             when (e.response.statusCode) {
                 400 -> throw BadRequestError()
@@ -169,15 +175,21 @@ object Sailor {
 
         val url = URL(urlOverride)
         return try {
-            val response = Fuel.get("$url/api/stats")
-                .awaitObjectResponse<StatsGetResponse>(kotlinxDeserializerOf())
+            val response = Fuel.get("$url/stats")
+                .awaitObjectResponse<GenericStatsGetResponse>(kotlinxDeserializerOf())
 
-            response.third
+            response.third.data
         } catch (e: FuelError) {
             when (e.response.statusCode) {
                 500 -> throw InternalServerError()
                 else -> throw e
             }
         }
+    }
+
+    private fun formatDomain(domain: String): String {
+        return domain.replace("http://", "")
+            .replace("https://", "")
+            .split("/")[0]
     }
 }
