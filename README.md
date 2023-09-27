@@ -21,6 +21,45 @@ Una base de datos colaborativa con enlaces maliciosos centrada pero no dedicada 
 - reportar <enlace> <razón> [tipo] [severidad] [nota] - Disponible para todos los usuarios.
 - comprobar <enlace>
 
+## Librerías oficiales
+Estas son las librerías oficiales del paquete, mantenidas activamente por el equipo de **Discusss**:
+
+### Kotlin
+
+Reemplazar `x.y.z` por la versión que se quiera usar, puedes ver todas las versiones en la [página de releases](https://github.com/Discusss/sailor/releases).
+
+* Repository: https://jitpack.io
+* Artifact: **com.github.discusss:sailor:x.y.z**
+
+Using in Gradle:
+```gradle
+repositories {
+  maven {
+    url 'https://jitpack.io'
+  }
+}
+
+dependencies {
+  implementation 'com.github.discusss:sailor:x.y.z'
+}
+```
+
+Using in Maven:
+```xml
+<repositories>
+    <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.github.discusss</groupId>
+  <artifactId>sailor</artifactId>
+  <version>x.y.z</version>
+</dependency>
+```
+
 ## Configuración del archivo `.env`
 
 Copia el contenido del archivo `.env.example` y rellena las variables.
