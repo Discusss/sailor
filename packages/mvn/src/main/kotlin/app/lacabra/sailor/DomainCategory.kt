@@ -1,3 +1,5 @@
+package app.lacabra.sailor
+
 enum class DomainCategory {
     Other,
     Phishing,

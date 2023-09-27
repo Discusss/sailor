@@ -1,11 +1,14 @@
-package responses
+package app.lacabra.sailor.responses
 
-import DomainCategory
+import app.lacabra.sailor.DomainCategory
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * The response from the domain get request
  * if the domain was not found, the response will be null
  */
+@Serializable
 data class DomainGetResponse(
     /**
      * The domain that was checked
@@ -27,10 +30,12 @@ data class DomainGetResponse(
     /**
      * The user that submitted the domain
      */
+    @SerialName("submitted_by")
     val submittedBy: String,
     /**
      * The date the domain was submitted
      */
+    @SerialName("submitted_at")
     val submittedAt: String,
 )
 
@@ -38,6 +43,7 @@ data class DomainGetResponse(
  * The response from the domain get request with a key
  * if the domain was not found, the response will be null
  */
+@Serializable
 data class DomainGetAdvancedResponse(
     /**
      * The internal ID of the domain
@@ -59,26 +65,32 @@ data class DomainGetAdvancedResponse(
     /**
      * The public notes of the domain left by the moderators
      */
+    @SerialName("public_notes")
     val publicNotes: String,
     /**
      * The user that submitted the domain
      */
+    @SerialName("submitted_by")
     val submittedBy: String,
     /**
      * The date the domain was submitted
      */
+    @SerialName("submitted_at")
     val submittedAt: String,
     /**
      * The reason the user gave when submitting the domain
      */
+    @SerialName("submitted_reason")
     val submittedReason: String,
     /**
      * The moderator that approved the domain
      */
+    @SerialName("approved_by")
     val approvedBy: String,
     /**
      * The date the domain was approved
      */
+    @SerialName("approved_at")
     val approvedAt: String,
     /**
      * The note the moderator left when approving the domain
@@ -87,5 +99,6 @@ data class DomainGetAdvancedResponse(
     /**
      * How many times the domain has been consulted
      */
+    @SerialName("times_consulted")
     val timesConsulted: Int,
 )

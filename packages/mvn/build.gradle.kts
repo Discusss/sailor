@@ -1,27 +1,51 @@
 plugins {
     kotlin("jvm") version "1.9.0"
-    application
+    kotlin("plugin.serialization") version "1.9.0"
+    id("maven-publish")
+    `java-library`
 }
 
 group = "app.lacabra"
-version = "1.0-SNAPSHOT"
+description = "Official Kotlin library for LA CABRA Sailor anti-phishing api."
+version = "1.0"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-}
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
-tasks.test {
-    useJUnitPlatform()
+    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
+    implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:2.3.1")
+    implementation("com.github.kittinunf.fuel:fuel-coroutines:2.3.1")
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(18)
 }
 
-application {
-    mainClass.set("MainKt")
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/holasoyender/ragdrop")
+            credentials {
+                username = "holasoyender"
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+    }
+}
+
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
 }
