@@ -15,6 +15,12 @@ data class GenericDomainGetAdvancedResponse(
 )
 
 @Serializable
+data class GenericDomainGetMasterResponse(
+    val status: Int,
+    val data: DomainGetMasterResponse,
+)
+
+@Serializable
 data class GenericDomainPostResponse(
     val status: Int,
     val data: DomainPostResponse,
