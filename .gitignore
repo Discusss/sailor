@@ -22,3 +22,6 @@ Cargo.lock
 .idea
 *.log
 **/__pycache__/
+
+**/node_modules/
+**/dist/
