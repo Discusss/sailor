@@ -1,0 +1,33 @@
+{
+  "name": "sailor",
+  "version": "0.0.1",
+  "description": "Official NPM for the Discusss anti-phishing API",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/axios": "^0.14.0",
+    "@types/node": "^8.0.29"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Discusss/phishing.git"
+  },
+  "keywords": [
+    "discord",
+    "phishing",
+    "database",
+    "npm",
+    "hacktoberfest"
+  ],
+  "author": "Markox36, ThePhoDit, holasoyender",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Discusss/phishing/issues"
+  },
+  "homepage": "https://github.com/Discusss/phishing#readme"
+}
