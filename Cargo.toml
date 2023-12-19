@@ -38,6 +38,6 @@ sea-orm = { version = "0.12.2", features = [ "sqlx-postgres", "runtime-tokio-rus
 dotenvy = { version = "0.15.7" }
 log = { version = "0.4.19" }
 fern = { version = "0.6.2", features = ["colored"] }
-validators = { version = "0.24.3" }
+validators = { version = "0.25.3" }
 tokio_schedule = { version = "0.3.1" }
 ureq = { version = "2.7.1", features = ["json", "serde_json"] }
